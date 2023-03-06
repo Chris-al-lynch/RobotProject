@@ -1,0 +1,10 @@
+webapp/node_modules
+interface/Dockerfile.interface
+mysql/Dockerfile.mysql
+simulator/Dockerfile.simulator
+webapp/Dockerfile.webapp
+docker-compose.yaml
+.dockerignore
+.git
+.gitignore
+.env

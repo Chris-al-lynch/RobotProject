@@ -1,0 +1,28 @@
+# The simulator will simulate the robot.  This will be written in C++.
+FROM gcc:latest
+
+# Copy the source to the container.
+COPY ./simulator /usr/src/robotSimulator
+
+# I want to use the newest version which is 3.26 at this time.
+# I have created a compressed tar.  It turns out that Docker requires
+# all files that are copied to be in the workspace.  
+# I will copy it to the root directory of the container for now.
+# Eventually, I will find a better location for the file.
+COPY ./cmake.tar.gz /
+
+# Extract cmake from the tar file and install it by hand.
+RUN tar -xzvf cmake.tar.gz && rm cmake.tar.gz && cd /usr/bin && ln -s /cmake/latest/bin/cmake
+
+# Set the working directory to the location of the source code.
+WORKDIR /usr/src/robotSimulator
+
+# Run cmake
+RUN cd ./build && /usr/bin/cmake .
+
+# Build the code.
+RUN cd ./build && /usr/bin/cmake --build .
+
+# Run the code.
+# TODO: NEED TO DECIDE IF THERE ARE ANY PARAMTERS
+CMD ["./bin/robotSimulator"]

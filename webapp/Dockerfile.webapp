@@ -1,0 +1,25 @@
+# The webapp will use react to implement a robot controller.
+FROM node:18-alpine
+
+# Make the directory for the code.
+RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+
+# Tell the container which packages we need to install
+COPY webapp/package.json /home/node/app
+COPY webapp/yarn.lock /home/node/app
+
+# Set the working directory
+WORKDIR /home/node/app
+
+# Install the packages.
+RUN yarn install --latest
+
+# Copy the code.
+COPY --chown=node:node ./webapp .
+
+RUN ls package.json
+
+EXPOSE 3000
+
+# Run the code.
+CMD ["yarn", "start"]

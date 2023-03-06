@@ -1,0 +1,23 @@
+# The interface will be what the webapp uses to interface with the
+# robot.  This will be mainly written in Java with a little C++.
+FROM eclipse-temurin:latest
+
+# I had issues installing Ant on this Docker image.  So, I decided to
+# download it myself and install it by hand.  I'll find a more sofisticated
+# way to do this later.
+COPY ./ant.tar.gz /
+
+RUN tar -xzvf /ant.tar.gz && rm /ant.tar.gz && cd /usr/bin && ln -s /ant/latest/bin/ant
+
+# Set the working directory.
+# TODO: Find a better location.
+WORKDIR /var/www/java
+
+# Copy the source to the container
+COPY ./interface /var/www/java/
+
+# Build the code.
+RUN /usr/bin/ant
+
+# Run the code.
+CMD ["java", "-jar", "dist/lib/RobotInterface.jar"]
