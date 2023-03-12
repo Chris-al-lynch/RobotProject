@@ -12,12 +12,10 @@ COPY webapp/yarn.lock /home/node/app
 WORKDIR /home/node/app
 
 # Install the packages.
-RUN yarn install --latest
+RUN yarn add latest
 
 # Copy the code.
 COPY --chown=node:node ./webapp .
-
-RUN ls package.json
 
 EXPOSE 3000
 

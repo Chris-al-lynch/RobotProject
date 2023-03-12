@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../../css/OvalButton.css';
 
 /**
@@ -6,13 +6,19 @@ import '../../../css/OvalButton.css';
  * 
  * TODO: Figure out how to vary the color of the button programatically.
  */
-export default class OvalButton extends Component
+export default function OvalButton( value, path )
 {
-   render()
+   const navigate = useNavigate();
+
+   function handleClick()
    {
-     return(
-        <button className="btn btn-oval" onClick={() => this.props.onClick()}>
-           {this.props.value}
-        </button> );
+      navigate( path );
+      console.log( "Going to page " + path );
+
    }
+
+   return(
+        <button className="btn btn-oval" onClick={handleClick}>
+           {value}
+        </button> );
 }

@@ -2,7 +2,7 @@
 
  There are 4 major components in this project:
 
- 1) webapp - This is the front-end user component.  I am new to webapp development, meaning all I have done at this point is a react tutorial and a react-route tutorial.  I will be learning as I go, but plan on being an expert by the time I'm finished.  This code will be developed using Node.js with React.
+ 1) webapp - This is the front-end user component.  I am new to webapp development, meaning all I have done at this point is a react tutorial and a react-route tutorial.  I will be learning as I go, but plan on being an expert by the time I'm finished.  This code will be developed using Node.js with React.  I am starting with the webapp component.  See the README.md file in the webapp directory for more information and progress.
 
  2) mysql - This is the storage for the webapp.  It will store the configuration information that will be used by the robot interface code.
 

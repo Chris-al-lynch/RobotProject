@@ -1,22 +1,19 @@
-import React, { Component } from "react";
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
+
 import ConfigButton from "./ConfigButton";
 import PlayButton from "./PlayButton";
-import '../../../css/MainButtonPanel.css';
 
 /**
  * A panel for holding the buttons on the main page.
  */
-export default class MainButtonPanel extends Component
+export default function MainButtonPanel()
 {
-   render()
-   {
-      return( <div className="main-button-panel">
-                <div>
-                  <ConfigButton/>
-                </div>
-                <div>
-                  <PlayButton/>
-                </div>
-              </div> );
-   }
+   return( <Container>
+             <Col>
+               <ConfigButton />
+               <PlayButton />
+             </Col>
+           </Container>
+         );
 }

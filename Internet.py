@@ -111,6 +111,8 @@ def parseArgs():
    muxGroup.add_argument( "--show", required=False, action='store_true', default=False )
    muxGroup.add_argument( "--connect", required=False, action='store', default=None )
    muxGroup.add_argument( "--isConnected", required=False, action='store_true', default=False )
+   # I got tired of resetting it by hand.  I'm going to run this in the background.
+   muxGroup.add_argument( "--monitor", required=False, action='store_true', default=False )
 
    args  = parser.parse_args()
 
@@ -126,11 +128,24 @@ def parseArgs():
       parms = args.connect
    elif( args.isConnected ):
       cmd = "isConnected"
+   elif( args.monitor ):
+      cmd = "monitor"
    
    if( cmd == None ):
       parser.error( "Must specify reset|show|connect")
    
    return (cmd,parms)
+
+def monitor():
+   ic = InternetConnection()
+
+   while True:
+      if( ic.isConnected() ):
+         sleep( 5 )
+      else:
+         ic.resetWifi()
+         if( not ic.isConnected() ):
+            ic.connect( "wifi2022" )
 
 ##
 # I wanted to be able to run these commands from the command line, so I
@@ -145,7 +160,7 @@ def main():
       ic = InternetConnection( parms )
 
    process = { "reset":ic.resetWifi, "show":ic.displayPossibleWifiConnections,
-               "connect":ic.connect, "isConnected":ic.isConnected }
+               "connect":ic.connect, "isConnected":ic.isConnected, "monitor":monitor }
 
    ec = process[cmd]()
 
