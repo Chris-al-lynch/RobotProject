@@ -1,8 +1,6 @@
 
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom';
 import MainButtonPanel from './utilities/MainButtonPanel';
 import '../../css/App.css';
 
@@ -25,11 +23,27 @@ import '../../css/App.css';
  */
 export default function App()
 {
-     return(
-             <div>
-               <MainButtonPanel />
-               <h1 className="App-header">Robot Project</h1>
-               <Outlet />
-             </div>
-           );
+   /* This code is used to load the home page on initial load only. */
+   const navigate = useNavigate();
+   const [startup, setStartup] = useState( true )
+
+   useEffect( () => {
+      if( startup )
+      {
+         navigate( '/home' );
+         setStartup( false );
+      }
+   }, [startup]);
+
+   return(
+           <>
+           <MainButtonPanel />
+           <div>
+             <h1 className="App-header">Robot Project</h1>
+           </div>
+           <div>
+             <Outlet />
+           </div>
+           </>
+         );
 }
