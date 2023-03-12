@@ -9,6 +9,7 @@ import './css/index.css';
 import App from './js/components/App';
 import ConfigPage from './js/components/config/ConfigPage.js';
 import ErrorPage from './js/components/ErrorPage';
+import HomePage from './js/components/HomePage';
 import PlayPage from './js/components/play/PlayPage.js';
 
 
@@ -17,6 +18,9 @@ const router = createBrowserRouter( [ { path: "/",
                                         errorElement: <ErrorPage />,
                                         children:
                                           [
+                                            { path: "/home",
+                                              element: <HomePage/>,
+                                            },
                                             { path: "/config",
                                               element: <ConfigPage/>,
                                             },
