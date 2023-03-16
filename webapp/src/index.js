@@ -1,36 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { ThemeProvider } from 'react-ui';
-import { tokens, components } from 'react-ui/themes/dark';
+import 'bootstrap/dist/css/bootstrap.css';
+
+import { RouterProvider } from 'react-router-dom'
 
 import './css/index.css';
 
-import App from './js/components/App';
-import ConfigPage from './js/components/config/ConfigPage.js';
-import ErrorPage from './js/components/ErrorPage';
-import HomePage from './js/components/HomePage';
-import PlayPage from './js/components/play/PlayPage.js';
-
-
-const router = createBrowserRouter( [ { path: "/",
-                                        element: <App/>,
-                                        errorElement: <ErrorPage />,
-                                        children:
-                                          [
-                                            { path: "/home",
-                                              element: <HomePage/>,
-                                            },
-                                            { path: "/config",
-                                              element: <ConfigPage/>,
-                                            },
-                                            { path: "/play",
-                                              element: <PlayPage/>,
-                                            }
-                                          ]
-                                      }
-                                    ]
-                                  );
+import router from './app/routes/Routes';
 
 /**
  * This code simply invokes the App component which is the main component
@@ -38,11 +14,13 @@ const router = createBrowserRouter( [ { path: "/",
  */
 const root = ReactDOM.createRoot( document.getElementById( 'root' ) );
 
+document.body.style = 'background: rgba( 33, 37, 41 )';
+
 /* TODO: StrictMode enables extra checks and debugging useful during development.
  *       Once finished, remove StrictMode
  */
 root.render( <React.StrictMode>
-               <ThemeProvider tokens={tokens} components={components}>
-                  <RouterProvider router={router} />
-               </ThemeProvider>
+               <div className="bg-dark">
+                <RouterProvider router={router} />
+               </div>
              </React.StrictMode> );

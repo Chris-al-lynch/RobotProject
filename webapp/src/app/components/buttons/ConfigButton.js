@@ -5,5 +5,5 @@ import OvalButton from "./OvalButton";
  */
 export default function ConfigButton()
 {
-   return( OvalButton( "Configure", "/config" ) );
+   return( OvalButton( "Configure", "/configselect" ) );
 }

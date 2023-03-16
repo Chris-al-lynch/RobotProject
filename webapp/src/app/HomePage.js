@@ -1,5 +1,5 @@
 
-import RobotLogo from '../../resources/RobotLogo.png';
+import RobotLogo from '../resources/RobotLogo.png';
 
 export default function HomePage()
 {

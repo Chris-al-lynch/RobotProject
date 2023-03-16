@@ -17,5 +17,5 @@ code {
 .justify-center {
    width: 100%;
    justify-content: center;
-   display: flex
+   display: flex;
 }

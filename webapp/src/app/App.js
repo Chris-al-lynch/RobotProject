@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom';
-import MainButtonPanel from './utilities/MainButtonPanel';
-import '../../css/App.css';
+import MainButtonPanel from './components/buttons/MainButtonPanel';
+import '../css/App.css';
 
 /***************************************************************************
  * WARNING TO ALL REACT DEVELOPERS:
