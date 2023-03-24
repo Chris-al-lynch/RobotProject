@@ -18,11 +18,11 @@ RUN tar -xzvf cmake.tar.gz && rm cmake.tar.gz && cd /usr/bin && ln -s /cmake/lat
 WORKDIR /usr/src/robotSimulator
 
 # Run cmake
-RUN cd ./build && /usr/bin/cmake .
+RUN /usr/bin/cmake .
 
 # Build the code.
-RUN cd ./build && /usr/bin/cmake --build .
+RUN /usr/bin/cmake --build .
 
 # Run the code.
 # TODO: NEED TO DECIDE IF THERE ARE ANY PARAMTERS
-CMD ["./bin/robotSimulator"]
+CMD ["./bin/robotSimulator -a localhost -p 3111"]
