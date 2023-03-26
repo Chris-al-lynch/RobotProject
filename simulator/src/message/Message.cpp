@@ -9,7 +9,7 @@ int Message::messageIdentifier = 0;
 
 Message::Message( char *messageBuffer )
 {
-    if( messageBuffer == NULL )
+    if( messageBuffer == nullptr )
     {
         throw MessageException( "Invalid NULL messageBuffer passed to Message constructor." );
     }
@@ -24,11 +24,6 @@ Message::isMessageValid()
     msgHeader *header = (msgHeader *)messageBuffer;
     
     if( header->marker != MSG_HEADER_MARKER )
-    {
-        return false;
-    }
-
-    if( header->msgLength != sizeof( messageBuffer ) )
     {
         return false;
     }
@@ -48,7 +43,7 @@ Message::getType()
 {
     messageType_t type = INVALID_MESSAGE;
 
-    if( messageBuffer != NULL )
+    if( messageBuffer != nullptr )
     {
         type = (messageType_t)(((msgHeader *)messageBuffer)->msgType);
     }
@@ -67,7 +62,7 @@ Message::getId()
 {
     int id = -1;
     
-    if( messageBuffer != NULL )
+    if( messageBuffer != nullptr )
     {
         id = ((msgHeader *)messageBuffer)->id;
     }
@@ -80,7 +75,7 @@ Message::getLength()
 {
     int length = -1;
 
-    if( messageBuffer != NULL )
+    if( messageBuffer != nullptr )
     {
         length = ((msgHeader *)messageBuffer)->msgLength;
     }

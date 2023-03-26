@@ -16,21 +16,16 @@ class ServerException : public exception
         string message;
 
     public:
-       ServerException( const string& msg ) : message( msg ) {};
-       ServerException( const char *msg ) : message( msg ) {};
-       ServerException( int error, const string& msg ) : error( error ), message( msg ) {};
-       ServerException( int error, const char *msg ) : error( error ), message( msg ) {};
+       ServerException( const string& msg, int error = -1) : error( error ), message( msg ) {};
+       ServerException( const char *msg, int error = -1 ) : error( error ), message( msg ) {};
 
+       int getError()
+       {
+           return error;
+       }
        const char *what() const throw ()
        {
-           string errorMsg = "An unexpected server error occurred: " + message;
-
-           if( error > 0 )
-           {
-               errorMsg += (" - " + string( strerror( error ) ) + " (" + to_string( error ) + ")" );
-           }
-
-           return( errorMsg.c_str() );
+           return message.c_str();
        }
 };
 
@@ -42,7 +37,7 @@ class LostConnectionException : public ServerException
 
         const char *what() const throw()
         {
-            return( ("A Lost Connection error occurred: " + message).c_str() );
+            return message.c_str();
         }
 };
 
@@ -56,18 +51,14 @@ class MessageException : public exception
        MessageException( const string& msg, int id = -1 ) : message( msg ), id( id ) {};
        MessageException( const char *msg, int id = -1 ) : message( msg ), id( id ) {};
 
+       int getId()
+       {
+          return id;
+       }
+
        const char *what() const throw ()
        {
-           string errorMsg = "An unexpected Message error occurred";
-           
-           if( id != -1 )
-           {
-               errorMsg += (" while processing message id " + to_string( id ) );
-           }
-
-           errorMsg += (": " + message);
-
-           return( errorMsg.c_str() );
+           return message.c_str();
        }
 };
 

@@ -8,7 +8,7 @@ MessageProcessor::MessageProcessor()
 {
     logger = new Logger();
     processorThread = new jthread( MessageProcessor::processor, this );
-    messageQueue = new MessageQueue();
+    messageQueue = MessageQueue::getInstance();
 }
 
 void
@@ -21,14 +21,33 @@ MessageProcessor::start()
 void
 MessageProcessor::processor( MessageProcessor *this_p )
 {
+    this_p->logger->logInfo( "Message processor thread started." );
+
     do
     {
         try
         {
             /* Wait for a message to be sent */
-            messageTransfer_t message = this_p->messageQueue->retrieveMessage();
+            messageTransfer_t message;
+            memset( &message, 0, sizeof( message ) );
+            this_p->messageQueue->retrieveMessage( &message );
+
+            if( message.msgBuffer == nullptr )
+            {
+                close( message.connection );
+                continue;
+            }
+
             message.respBuffer = this_p->processMessage( message.msgBuffer );
-            this_p->messageQueue->addResponse( message );
+            if( message.respBuffer != nullptr )
+            {
+                this_p->messageQueue->addResponse( message );
+            }
+            else
+            {
+                close( message.connection );
+                free( message.msgBuffer );
+            }
         }
         catch( const exception& e )
         {
@@ -56,7 +75,6 @@ MessageProcessor::processMessage( char *messageBuffer )
             logger->logInfo( "Test Message received with id = "
                            + to_string( tm.getId() ) );
             return tm.processMessage();
-            break;
         }
         case MOVEMENT_MESSAGE:
         {
@@ -72,9 +90,10 @@ MessageProcessor::processMessage( char *messageBuffer )
         }
         default:
         {
+            logger->logInfo( "An unexpected message received." );
             break;
         }
     }
 
-    return NULL;
+    return nullptr;
 }

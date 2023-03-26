@@ -5,24 +5,15 @@
 
 using namespace std;
 
-typedef struct testMessage
-{
-   char *message;
-} testMessage;
-
-typedef struct testResponse
-{
-   char *message;
-} testResponse;
-
 class TestMessage : public Message
 {
     private:
-        char *generateTestResponse( string message );
     public:
         TestMessage( char *messageBuffer );
         char *processMessage();
         char *generateTestMessage( string message );
+        static char *generateTestResponse( string message, int id );
+        bool operator!=( TestMessage &msg1 );
 };
 
 #endif

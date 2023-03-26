@@ -2,11 +2,10 @@
 #include <getopt.h>
 
 #include <iostream>
-#include <cstring>
 #include <string>
 
-#include "Exceptions.h"
-#include "Server.h"
+#include "Client.h"
+#include "ClientException.h"
 
 using namespace std;
 
@@ -14,16 +13,17 @@ typedef struct arguments
 {
     int port;
     string address;
+    string testMessage;
 } arguments;
 
 arguments
 parseArgs( int argc, char *argv[] )
 {
-    string usage = "server -a <address> -p <port number>";
+    string usage = "server -a <address> -p <port number> -m <test message>";
     arguments args;
     int opt;
 
-    while( (opt=getopt( argc, argv, "p:a:" )) )
+    while( (opt=getopt( argc, argv, "p:a:m:" )) )
     {
         if( opt == -1 )
         {
@@ -41,10 +41,14 @@ parseArgs( int argc, char *argv[] )
                 args.port = atoi( optarg );
                 break;
             }
+            case 'm':
+            {
+                args.testMessage = optarg;
+                break;
+            }
             default:
             {
                 cout << usage << endl << endl;
-                cout << "argument " << opt << " is invalid" << endl;
                 exit( EXIT_FAILURE );
             }
         }
@@ -61,27 +65,23 @@ main( int argc, char *argv[] )
 
     try
     {
-        Server server( args.address, args.port );
+        Client client( args.address, args.port );
 
-        server.start();
+        cout << "Calling sendTestMessage( " + args.testMessage + ")" << endl;
+        client.sendTestMessage( args.testMessage );
     }
-    catch( ServerException& se )
+    catch( ClientException *ce )
     {
-        cout << se.what();
-
-        if( se.getError() != -1 )
-        {
-            cout << ": " + string( strerror( se.getError() ) ) + "(" + to_string( se.getError() ) + ")";
-        }
-
-        cout << endl;
-        exit( 1 );
+        cout << "Send Test Message Failed: " << endl;
+        cout << string( ce->what() ) << endl;
+        delete ce;
     }
-    catch( exception& e )
+    catch( const exception& e )
     {
-        cout << "An unexpected error occurred: " + string( e.what() ) << endl;
-        exit( 2 );
+        cout << "Unexpected Send Test Message Failed: " << endl;
+        printf( "%s\n", e.what() );
+        //cout << string( e.what() ) << endl;
     }
-
+    
     exit( 0 );
 }

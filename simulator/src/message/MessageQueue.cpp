@@ -3,6 +3,9 @@
 
 using namespace std;
 
+MessageQueue *
+MessageQueue::instance = nullptr;
+
 MessageQueue::MessageQueue()
 {
     messageQueue = new queue<messageTransfer_t>();
@@ -29,27 +32,32 @@ MessageQueue::addMessage( messageTransfer_t msg )
     msgQueueLock->lock();
     {
         messageQueue->push( msg );
-        /* Notify that something has been put on the queue. */
-        messageSemaphore->release();
     }
     msgQueueLock->unlock();
+
+    /* Notify that something has been put on the queue. */
+    messageSemaphore->release();
 }
 
-messageTransfer_t
-MessageQueue::retrieveMessage()
+void
+MessageQueue::retrieveMessage( messageTransfer_t *msg )
 {
-    messageTransfer_t msg;
+
+    /* Wait for something to be added to the queue. */
+    messageSemaphore->acquire();
 
     msgQueueLock->lock();
     {
-        /* Wait for something to be added to the queue. */
-        messageSemaphore->acquire();
-        msg = messageQueue->front();
-        messageQueue->pop();
+        if( !messageQueue->empty() )
+        {
+            msg->connection = messageQueue->front().connection;
+            msg->msgBuffer  = messageQueue->front().msgBuffer;
+            msg->respBuffer = nullptr;
+
+            messageQueue->pop();
+        }
     }
     msgQueueLock->unlock();
-
-    return msg;
 }
 
 void
@@ -58,25 +66,40 @@ MessageQueue::addResponse( messageTransfer_t resp )
     respQueueLock->lock();
     {
         responseQueue->push( resp );
-        /* Notify that something has been put on the queue. */
-        responseSemaphore->release();
+    }
+    respQueueLock->unlock();
+
+    /* Notify that something has been put on the queue. */
+    responseSemaphore->release();
+}
+
+void
+MessageQueue::retrieveResponse( messageTransfer_t *resp )
+{
+    /* Wait for something to be added to the queue. */
+    responseSemaphore->acquire();
+
+    respQueueLock->lock();
+    {
+        if( !responseQueue->empty() )
+        {
+            resp->connection = responseQueue->front().connection;
+            resp->msgBuffer  = responseQueue->front().msgBuffer;
+            resp->respBuffer = responseQueue->front().respBuffer;
+
+            responseQueue->pop();
+        }
     }
     respQueueLock->unlock();
 }
 
-messageTransfer_t
-MessageQueue::retrieveResponse()
+MessageQueue *
+MessageQueue::getInstance()
 {
-    messageTransfer_t resp;
-
-    respQueueLock->lock();
+    if( instance == nullptr )
     {
-        /* Wait for something to be added to the queue. */
-        responseSemaphore->acquire();
-        resp = responseQueue->front();
-        responseQueue->pop();
+        instance = new MessageQueue();
     }
-    respQueueLock->unlock();
 
-    return resp;
+    return instance;
 }

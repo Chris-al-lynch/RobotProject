@@ -18,8 +18,8 @@ class Message
 {
     private:
         static int messageIdentifier;
-        const int MSG_HEADER_MARKER = 0x0BADDAD0;
-        const int MSG_TRAILER_MARKER = 0x0DADBAD0;
+        static const int MSG_HEADER_MARKER = 0x0BADDAD0;
+        static const int MSG_TRAILER_MARKER = 0x0DADBAD0;
 
     protected:
         typedef struct msgHeader
@@ -40,11 +40,11 @@ class Message
         Logger *logger;
         static int getMessageIdForNewMessage();
 
-        void generateMessageHeader( msgHeader *hdr, int length,
-                                    messageType_t type );
-        void generateResponseHeader( msgHeader *hdr, int length,
-                                     messageType_t type, int id );
-        void generateTrailer( msgTrailer *trailer );
+        static void generateMessageHeader( msgHeader *hdr, int length,
+                                           messageType_t type );
+        static void generateResponseHeader( msgHeader *hdr, int length,
+                                            messageType_t type, int id );
+        static void generateTrailer( msgTrailer *trailer );
 
     public:
         Message( char *messageBuffer );
@@ -52,7 +52,7 @@ class Message
         int getId();
         int getLength();
         bool isMessageValid();
-        virtual char *processMessage(){ return NULL; }
+        virtual char *processMessage(){ return nullptr; }
 };
 
 #endif

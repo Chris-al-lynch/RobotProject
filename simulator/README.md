@@ -4,13 +4,15 @@ Progress:
 
 This component was going to be one of the last ones I worked on.  However, I have a coding interview in C++ coming up and need some C++ practice.  So, I'm going to do some work on it now.
 
-I have written a TCP server which receives messages from a client (yet to be written), processes the message, and returns a response back to the sender.  I will describe each of the classes used to develop this code.  Keep in mind that there is no client yet, which means this code has not been tested yet.  I still need to go through and comment the code, write a test client, and test everything.  Eventually, the client will be written in Java as the interface component.  That will be done after I finish with this component and verify everything is working.
+I have written a TCP server which receives messages from a client (yet to be written), processes the message, and returns a response back to the sender.  I wrote a test client that sends a test message receives the response and validates that the response is correct.  I will describe each of the classes used to develop this code.  I still need to go through and comment the code.  However, that will have to be done later.  I have a Java coding interview coming up soon, and I need to practice Java.  It's been awhile.
 
 utilities:
 
 Exceptions.cpp contains multiple exception classes.  I like to create my own exceptions so it is easier to see which component failed.
 
 Logger - I always create a Logger class for most big projects.  It makes it easier to change how things are logged.  Right now, everything is going to standard out.  If later I want to send things to a file or both to a file and standard out, I only have to change it in the Logger class.
+
+utils.[h|cpp] - General utilities will go here.  Currently there is a function to convert an integer/short/long to an hex string.
 
 
 server:

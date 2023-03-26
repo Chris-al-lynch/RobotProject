@@ -6,6 +6,7 @@
 #include <thread>
 
 #include "Logger.h"
+#include "MessageProcessor.h"
 #include "MessageQueue.h"
 
 using namespace std;
@@ -38,6 +39,7 @@ class Server
        sockaddr_in socketAddress;
        /* Message Queue */
        MessageQueue *messageQueue;
+       MessageProcessor *messageProcessor;
        jthread *responseThread;
 
        /* I always create a logger class in case I want to change
