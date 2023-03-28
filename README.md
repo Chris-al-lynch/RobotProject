@@ -2,15 +2,15 @@
 
  There are 4 major components in this project:
 
- 1) webapp - This is the front-end user component.  I am new to webapp development, meaning all I have done at this point is a react tutorial and a react-route tutorial.  I will be learning as I go, but plan on being an expert by the time I'm finished.  This code will be developed using Node.js with React.  I am starting with the webapp component.  See the README.md file in the webapp directory for more information and progress.
+ 1) webapp - This is the front-end user component.  I am new to webapp development, meaning all I have done at this point is a react tutorial and a react-route tutorial.  I will be learning as I go, but plan on being an expert by the time I'm finished.  This code will be developed using Node.js with React.  I am starting with the webapp component.  See the README.md file in the webapp directory for more information and progress.  I have some initial code here, but I have moved to other components to practice for job interviews
 
  2) mysql - This is the storage for the webapp.  It will store the configuration information that will be used by the robot interface code.
 
- 3) interface - This is the interface between the webapp code and the robot itself.  It will access the database to retrieve configuration information as well.  I will develop this code using Java and hopefully find a reason to add some JNI with C++.
+ 3) interface - This is the interface between the webapp code and the robot itself.  It will access the database to retrieve configuration information as well.  I will develop this code using Java and hopefully find a reason to add some JNI with C++.  I have started on this because I have a Java coding interview coming up soon.  I am starting with developing the client to talk with the C++ server which I already developed.  I will move forward from there.
 
- 4) simulator - This code will simulate a real robot.  This includes sensors and motors.  One of my goals here is to hookup a webcam and simulate a camera on the robot and attempt to stream the image back to the webapp.  This code will be written in C++.
+ 4) simulator - This code will simulate a real robot.  This includes sensors and motors.  One of my goals here is to hookup a webcam and simulate a camera on the robot and attempt to stream the image back to the webapp.  This code will be written in C++.  I have a C++ server written along with a test client.  See the Readme.md file for more information.
 
- I am hoping to find a reason to throw in some Python as well just to show my code.
+ I have developed some simple Python scripts to do some simple tasks.  There is a run.py script which does all of the docker stuff so I don't have to remember how to do the docker commands.  There is a removeCmakeFiles.py script to cleanup everything after cmake leaves its mess behind.  And there is an Internet.py which I created due to a faulty Wifi card in my computer which I no longer need because I went out and bought a new switch and am not hard-wired with my PC.
 
 I will be using separate Docker containers for each component.  I am also new to Docker and container development.  I was asked about container development in an interview and had no idea what they were talking about.  I have always worked in a big company with access to any hardware I wanted.  We never had a need for containers.  The closest we got was using virtual machines.  So, I did a Docker tutorial, and now I'm ready to be an expert with Docker containers.  I have created a YAML file (docker-compose.yml) for bringing up all of the containers together.
 
