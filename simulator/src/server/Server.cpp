@@ -264,55 +264,6 @@ Server::acceptConnection()
     return (clientSocket)connection;
 }
 
-#undef TEST
-#ifdef TEST
-char *
-Server::receiveRequest( clientSocket connection )
-{
-    ssize_t bytesRead;
-    int recvDataLength;
-    char *msgBuffer = (char *)calloc( 1024, sizeof( char ) );
-
-    bytesRead = recv( connection, msgBuffer, 1024, 0 );
-
-    if( bytesRead <= 0 )
-    {
-        throw ServerException( "Failed to receive data length", errno );
-    }
-
-    logger->logInfo( "Read " + to_string( bytesRead ) + " bytes of data." );
-
-
-/*
-    logger->logInfo( "Reading data length" );
-    bytesRead = recv( connection, (char *)&recvDataLength, sizeof( int ), MSG_DONTWAIT );
-
-    if( bytesRead < 2 )
-    {
-        throw ServerException( "Failed to receive data length", errno );
-    }
-
-    logger->logInfo( "Data length is " + to_string( recvDataLength ) );
-
-    char *msgBuffer = (char *)calloc( recvDataLength, sizeof( char ) );
-
-    memcpy( msgBuffer, &recvDataLength, sizeof( int ) );
-
-    logger->logInfo( "Reading data" );
-    bytesRead = recv( connection, &msgBuffer[sizeof( int )], recvDataLength - sizeof( int ), MSG_DONTWAIT );
-
-    if( bytesRead < 2 )
-    {
-        throw ServerException( "Failed to receive data", errno );
-    }
-
-    logger->logInfo( "Read " + to_string( bytesRead ) + " bytes of data." );
-    */
-
-    return msgBuffer;
-}
-
-#else
 char *
 Server::receiveRequest( clientSocket connection )
 {
@@ -324,7 +275,7 @@ Server::receiveRequest( clientSocket connection )
     ssize_t totalBytes = 0;
 
     /* The first two bytes of the message is the size of the message. */
-    int recvDataLength;
+    int rawRecvDataLength;
 
     logger->logInfo( "Reading data length." );
 
@@ -340,7 +291,7 @@ Server::receiveRequest( clientSocket connection )
          * I like to use recv() when transferring messages in case I need to
          * use extra flags for the transfer.
          */
-        bytesRead = recv( connection, (char *)&recvDataLength, sizeof( int ), 0 );
+        bytesRead = recv( connection, (char *)&rawRecvDataLength, sizeof( int ), 0 );
 
         totalBytes += bytesRead;
 
@@ -358,6 +309,19 @@ Server::receiveRequest( clientSocket connection )
         }
     } while( totalBytes < 2 );
     logger->logInfo( "Read a total of " + to_string( totalBytes ) + " bytes when reading length." );
+
+    /* Since this code is coming from Java, we have to swap the bytes.  Java
+     * stores data in its buffers in big endian format no matter what hardware
+     * it is running on.  C++ does not not make any modifications to the buffer
+     * and is hardware dependent.  In this case, I am running on a little endian
+     * machine.  
+     * 
+     * TODO: I need to add a #ifdef to only do this if I'm running on
+     * little endian machine.  Also, this buildin function I'm using is
+     * specific to the gcc compiler I'm using.  I need a #ifdef for that
+     * as well.  I will do this later.
+     */
+    int recvDataLength = __builtin_bswap32( rawRecvDataLength );
 
     logger->logInfo( "Allocating buffer that is " + to_string( recvDataLength ) + " bytes." );
     char *msgBuffer = (char *)calloc( recvDataLength, sizeof( char ) );
@@ -412,7 +376,6 @@ Server::receiveRequest( clientSocket connection )
 
     return msgBuffer;
 }
-#endif
 
 void
 Server::stop()

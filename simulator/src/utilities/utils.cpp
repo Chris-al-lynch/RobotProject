@@ -1,11 +1,12 @@
+#include <iomanip>
+#include <sstream>
 
 #include "utils.h"
 
-template <typename T>
-string intToHexString( T num )
+string intToHexString( int num )
 {
     stringstream stream;
-    stream << "0x" << setfill( '0' ) << setw( sizeof( T ) * 2 ) << hex << num;
+    stream << "0x" << setfill( '0' ) << setw( sizeof( int ) * 2 ) << hex << num;
 
     return stream.str();
 }

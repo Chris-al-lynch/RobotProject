@@ -7,11 +7,11 @@ using namespace std;
 
 typedef enum messageType
 {
-   INVALID_MESSAGE = -1,
-   TEST_MESSAGE,
-   MOVEMENT_MESSAGE,
-   SENSE_MESSAGE,
-   RESPONSE_MESSAGE
+   INVALID_MESSAGE  = 0,
+   MOVEMENT_MESSAGE = 1,
+   SENSE_MESSAGE    = 2,
+   TEST_MESSAGE     = 3,
+   TEST_RESPONSE    = 4
 } messageType_t;
 
 class Message

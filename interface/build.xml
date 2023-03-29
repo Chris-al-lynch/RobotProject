@@ -13,6 +13,7 @@
 
   <target name="init">
     <!-- Create the time stamp -->
+    <echo>Java/JVM version: ${java.version}</echo>
     <tstamp/>
     <!-- Create the build directory structure -->
     <mkdir dir="${build.dir}"/>

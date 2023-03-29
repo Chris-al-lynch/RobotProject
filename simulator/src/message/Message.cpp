@@ -1,6 +1,7 @@
 
 #include <climits>
 #include <cstdlib>
+#include <iostream>
 
 #include "Exceptions.h"
 #include "Message.h"
@@ -22,15 +23,22 @@ bool
 Message::isMessageValid()
 {
     msgHeader *header = (msgHeader *)messageBuffer;
+
+    int marker = __builtin_bswap32( header->marker );
+
+    printf( "header marker = 0x%08X\n", marker );
     
-    if( header->marker != MSG_HEADER_MARKER )
+    if( marker != MSG_HEADER_MARKER )
     {
         return false;
     }
 
     msgTrailer *trailer = (msgTrailer *)&messageBuffer[header->msgLength - sizeof( msgTrailer )];
 
-    if( trailer->marker != MSG_TRAILER_MARKER )
+    marker = __builtin_bswap32( trailer->marker );
+    printf( "trailer marker = 0x%08X\n", marker );
+
+    if( marker != MSG_TRAILER_MARKER )
     {
         return false;
     }
@@ -45,8 +53,10 @@ Message::getType()
 
     if( messageBuffer != nullptr )
     {
-        type = (messageType_t)(((msgHeader *)messageBuffer)->msgType);
+        type = (messageType_t)__builtin_bswap32( ((msgHeader *)messageBuffer)->msgType );
     }
+
+    cout << "type = " + to_string(type ) << endl;
 
     return type;
 }
@@ -64,7 +74,7 @@ Message::getId()
     
     if( messageBuffer != nullptr )
     {
-        id = ((msgHeader *)messageBuffer)->id;
+        id = __builtin_bswap32( ((msgHeader *)messageBuffer)->id );
     }
 
     return id;
@@ -77,7 +87,7 @@ Message::getLength()
 
     if( messageBuffer != nullptr )
     {
-        length = ((msgHeader *)messageBuffer)->msgLength;
+        length = __builtin_bswap32( ((msgHeader *)messageBuffer)->msgLength );
     }
 
     return length;

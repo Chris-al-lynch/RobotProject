@@ -1,6 +1,7 @@
 
 #include <climits>
 #include <cstdlib>
+#include <iostream>
 
 #include "Exceptions.h"
 #include "Message.h"
@@ -45,6 +46,8 @@ TestMessage::generateTestMessage( string message )
     memcpy( &newMessage[sizeof( header ) + message.size() + 1], &trailer,
             sizeof( msgTrailer ) );
 
+    cout << "Trailer marker = " + to_string( trailer.marker ) << endl;
+
     return newMessage;
 }
 
@@ -76,7 +79,7 @@ TestMessage::generateTestResponse( string responseMessage, int msgId )
     msgHeader header;
     msgTrailer trailer;
 
-    generateResponseHeader( &header, messageLength, TEST_MESSAGE, msgId );
+    generateResponseHeader( &header, messageLength, TEST_RESPONSE, msgId );
     generateTrailer( &trailer );
 
     memcpy( response, &header, sizeof( msgHeader ) );

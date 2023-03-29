@@ -5,7 +5,6 @@
 
 using namespace std;
 
-template <typename T>
-string intToHexString( T num );
+string intToHexString( int num );
 
 #endif
