@@ -1,5 +1,5 @@
 # The simulator will simulate the robot.  This will be written in C++.
-FROM gcc:latest
+FROM ubuntu:latest
 
 # Copy the source to the container.
 COPY ./simulator /usr/src/robotSimulator
@@ -14,6 +14,10 @@ COPY ./cmake.tar.gz /
 # Extract cmake from the tar file and install it by hand.
 RUN tar -xzvf cmake.tar.gz && rm cmake.tar.gz && cd /usr/bin && ln -s /cmake/latest/bin/cmake
 
+RUN apt update
+RUN apt install -y gcc-11 gcc-11-base gcc-11-doc g++-11 && ln -s /usr/bin/g++-11 /usr/bin/g++
+RUN apt install -y libstdc++-11-dev libstdc++-11-doc make
+
 # Set the working directory to the location of the source code.
 WORKDIR /usr/src/robotSimulator
 
@@ -24,5 +28,4 @@ RUN /usr/bin/cmake .
 RUN /usr/bin/cmake --build .
 
 # Run the code.
-# TODO: NEED TO DECIDE IF THERE ARE ANY PARAMTERS
 CMD ["./bin/robotSimulator -a localhost -p 3111"]
