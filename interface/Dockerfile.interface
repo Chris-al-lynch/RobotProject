@@ -20,4 +20,4 @@ COPY ./interface /var/www/java/
 RUN /usr/bin/ant
 
 # Run the code.
-CMD ["java", "-jar", "dist/lib/RobotInterface.jar"]
+CMD java -jar ./dist/lib/RobotInterface.jar -a localhost -p 6000 -m "Chris sending a message."

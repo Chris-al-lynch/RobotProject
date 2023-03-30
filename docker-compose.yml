@@ -2,16 +2,26 @@
 # YAML file to build the multi-container Docker environment for
 # the Robot Controller WebApp.
 services:
-  # Container for running the webapp that interfaces with the
-  # database and the robot interface software.
-  webapp:
-    image: robot/webapp
+
+  # We are not going to build a real robot at this time.  For now,
+  # I will build a robot simulator to 
+  simulator:
+    image: robot/simulator
     build:
       context: .
-      dockerfile: ./webapp/Dockerfile.webapp
+      dockerfile: ./simulator/Dockerfile.simulator
     ports:
-      - 3000:3000
-
+      - "6000:6000"
+  
+  # This is the interface between the webapp and the robot.
+  interface:
+    image: robot/interface
+    build:
+      context: .
+      dockerfile: ./interface/Dockerfile.interface
+    ports: 
+      - "5000:5000"
+  
   # Container for storing webapp data.  This will contain configuration
   # information which will be shared with the interface container.
   mysql:
@@ -32,25 +42,16 @@ services:
       - dbvolume:/var/lib/mysql
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD:1
-
-  # This is the interface between the webapp and the robot.
-  interface:
-    image: robot/interface
+  
+  # Container for running the webapp that interfaces with the
+  # database and the robot interface software.
+  webapp:
+    image: robot/webapp
     build:
       context: .
-      dockerfile: ./interface/Dockerfile.interface
-    ports: 
-      - "5000:5000"
- 
-  # We are not going to build a real robot at this time.  For now,
-  # I will build a robot simulator to 
-  simulator:
-    image: robot/simulator
-    build:
-      context: .
-      dockerfile: ./simulator/Dockerfile.simulator
+      dockerfile: ./webapp/Dockerfile.webapp
     ports:
-      - "6000:6000"
+      - 3000:3000
 
 # Create a docker volume in a docker container.
 volumes:
