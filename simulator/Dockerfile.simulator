@@ -29,5 +29,5 @@ RUN /usr/bin/cmake --build .
 
 # Run the code.
 # TODO: NEED TO DECIDE IF THERE ARE ANY PARAMTERS
-CMD /usr/src/robotSimulator/bin/robotSimulator -a localhost -p 6000
+CMD /usr/src/robotSimulator/bin/robotSimulator -a ${NETWORK_ADDRESS} -p ${NETWORK_PORT}
 #CMD "/bin/bash -c 'while true; do sleep 1; done'

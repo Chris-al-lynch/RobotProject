@@ -10,8 +10,13 @@ services:
     build:
       context: .
       dockerfile: ./simulator/Dockerfile.simulator
+      args:
+        - NETWORK_ADDRESS=robot
+        - NETWORK_PORT=6000
     ports:
-      - "6000:6000"
+      - "6666:6666"
+    networks:
+      - robot
   
   # This is the interface between the webapp and the robot.
   interface:
@@ -20,29 +25,35 @@ services:
       context: .
       dockerfile: ./interface/Dockerfile.interface
     ports: 
-      - "5000:5000"
+      - "5555:5555"
+    networks:
+      - mysql
+      - robot
+      - interface
   
   # Container for storing webapp data.  This will contain configuration
   # information which will be shared with the interface container.
   mysql:
-    # Figure out build
-    image: robot/database
+    #image: mysql:latest
+    image: robot/mysql
     build:
       context: .
       dockerfile: ./mysql/Dockerfile.mysql
       args:
-        - MYSQL_DATABASE=${MYSQL_DATABASE}
-        - MYSQL_USER=${MYSQL_USER}
-        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+        - MYSQL_DATABASE=configDB
+        - MYSQL_USER=configUser
+        - MYSQL_PASSWORD=configUserPassword1
+        - MYSQL_ROOT_PASSWORD=rootPassword1
     ports:
       - "3306:3306"
+    restart: always
     # Store the data in a docker volume described below.
     volumes:
-      - dbvolume:/var/lib/mysql
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD:1
-  
+      - "./mysql/dbSchema.sql:/docker-entrypoint-initdb.d/dbSchema.sql"
+      - dbvolume:/virtual/data/mysql
+    networks:
+      - mysql
+    
   # Container for running the webapp that interfaces with the
   # database and the robot interface software.
   webapp:
@@ -52,7 +63,14 @@ services:
       dockerfile: ./webapp/Dockerfile.webapp
     ports:
       - 3000:3000
+    networks:
+      - mysql
 
 # Create a docker volume in a docker container.
 volumes:
    dbvolume:
+  
+networks:
+    mysql:
+    robot:
+    interface:
