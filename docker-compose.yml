@@ -47,7 +47,6 @@ services:
     ports:
       - "3306:3306"
     restart: always
-    # Store the data in a docker volume described below.
     volumes:
       - "./mysql/dbSchema.sql:/docker-entrypoint-initdb.d/dbSchema.sql"
       - dbvolume:/virtual/data/mysql
