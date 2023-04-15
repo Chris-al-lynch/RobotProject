@@ -17,7 +17,7 @@ RUN yarn add latest
 # Copy the code.
 COPY --chown=node:node ./webapp .
 
-EXPOSE 3000
+EXPOSE 3333
 
 # Run the code.
-CMD ["yarn", "start"]
+CMD ["yarn", "run", "start"]

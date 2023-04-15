@@ -2,9 +2,13 @@
  
  I am attempting to take on some difficult tasks which I will thoroughly comment eventually to explain how they work.  An example of this is TCP communication in C++.  Doing a search of this typically shows the "happy" path.  It shows how to send and receive packets using simple send() and recv() or write() and read().  What is hard to find is what happens when you only get part of the packet on recv().  The description of the function clearly indicates that the function returns the number of bytes actually received.  What is not clear is what do you do if you receive less data than you were expecting.  The easy thing to do is to fail it.  However, if your packet buffer happens to be smaller than the data on which you are waiting, then you will never receive the full data in one recv() call.  You have to call recv() again to get the rest of the data.  I look forward to teaching difficult topics such as this.
 
+It seems that there is another component.  React is a framework for building the front-end user interface stuff.  However, your front-end should not touch the database directly.  It needs to go through a back-end server.  There are a lot of Frameworks for doing this.  I'm going to use Django and Python to implement the back-end server.
+
  There are 4 major components in this project:
 
- 1) webapp - This is the front-end user component.  I am new to webapp development, meaning all I have done at this point is a react tutorial and a react-route tutorial.  I will be learning as I go, but plan on being an expert by the time I'm finished.  This code will be developed using Node.js with React.  I am starting with the webapp component.  See the README.md file in the webapp directory for more information and progress.  I have some initial code here, but I have moved to other components to practice for job interviews
+ 1) webapp Front-end - This is the front-end user component.  I am new to webapp development, meaning all I have done at this point is a react tutorial and a react-route tutorial.  I will be learning as I go, but plan on being an expert by the time I'm finished.  This code will be developed using Node.js with React.  I am starting with the webapp component.  See the README.md file in the webapp directory for more information and progress.  I have some initial code here, but I have moved to other components to practice for job interviews
+
+ 2) webapp Back-end - This is the interface between the front-end and Mysql.  I plan on using Django with Python to develop this component.
 
  2) mysql - This is the storage for the webapp.  It will store the configuration information that will be used by the robot interface code.
 

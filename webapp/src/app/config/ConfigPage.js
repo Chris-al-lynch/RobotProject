@@ -1,10 +1,9 @@
-import REACT, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-
+import { getAllConfigNames, deleteConfig } from '../backend/backend'
 import DeleteConfirmation from '../components/popups/DeleteConfirmation';
-//import { GetAllConfigNames, DeleteConfig } from '../../database/Database';
 
 /**
  * This page will read existing configurations from the data base and list them
@@ -19,11 +18,13 @@ export default function ConfigPage()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState( false );
   const [itemToDelete, setItemToDelete] = useState( "" );
 
-  //const names = GetAllConfigNames();
-
   useEffect( () => {
-                     const names = ["fred", "joe", "robot", "Iron Giant"];
-                     setConfigs( names );
+                       async function getNames()
+                       {
+                           let names = await getAllConfigNames();
+                           setConfigs( names );
+                       }
+                       getNames();
                    }, [] );
 
   const navigate = useNavigate();
@@ -53,10 +54,11 @@ export default function ConfigPage()
      console.log( myText );
   }
 
-  function handleDelete( item )
+  async function handleDelete( item )
   {
-     //DeleteConfig( item );
-     //setConfigs( GetAllConfigNames() );
+     console.log( "Deleting: " + JSON.stringify( item ) );
+     await deleteConfig( item );
+     setConfigs( await getAllConfigNames() );
      setShowDeleteConfirm( false );
   }
 
@@ -65,11 +67,18 @@ export default function ConfigPage()
      setShowDeleteConfirm( false );
   }
 
+  async function onFocus()
+  {
+      let names = await getAllConfigNames();
+      setConfigs( names );
+  }
+
   return( <>
-            <Form>
+            <Form autoFocus onFocus={onFocus}>
               <h1 className='text-light'>Choose Configuration To Load: </h1>
               <div className='text-light' onChange={onChange}>
-                { configs.map( config =>
+                {
+                  configs.map( config =>
                         ( <Form.Check type='radio'
                                       name='configGroup'
                                       id={config}

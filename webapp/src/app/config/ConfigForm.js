@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import SubmitConfirmation from '../components/popups/SubmitConfirmation';
-//import { AddConfig } from '../../database/Database';
+import { addNewConfig } from '../backend/backend'
 
 export default function ConfigForm()
 {
@@ -22,6 +22,7 @@ export default function ConfigForm()
 
       /* TODO: Validate the fields */
 
+      console.log( "onSubmit()" )
       setDataToSubmit( [ {key: 1, label: "name: ", value: name},
                          {key: 2, label: "address: ", value: address},
                          {key: 3, label: "port: ", value: port},
@@ -39,10 +40,10 @@ export default function ConfigForm()
       console.log( "handleSubmit(): ")
       data.map( (data) => console.log( data.label + data.value ) );
 
-      //AddConfig( data );
-
       /* TODO: Add spinner for database update. */
       setShowSubmitConfirm( false );
+
+      addNewConfig( data )
 
       navigate( -1 );
    }
@@ -85,7 +86,7 @@ export default function ConfigForm()
                              value={description} />
                <br />
                <Button type='submit'>Submit</Button>
-               <Button type='cancel' onClick={onCancel}>Submit</Button>
+               <Button type='cancel' onClick={onCancel}>Cancel</Button>
              </Form>
              <div>
                <SubmitConfirmation dataToSubmit={dataToSubmit}

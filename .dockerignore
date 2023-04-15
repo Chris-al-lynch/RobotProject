@@ -1,3 +1,6 @@
+backend/Dockerfile.backend
+backend/robot/robot/__pycache__
+backend/robot/robotbackend/__pycache__
 webapp/node_modules
 interface/Dockerfile.interface
 mysql/Dockerfile.mysql

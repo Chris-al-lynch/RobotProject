@@ -27,6 +27,8 @@ RUN /usr/bin/cmake .
 # Build the code.
 RUN /usr/bin/cmake --build .
 
+EXPOSE 6666
+
 # Run the code.
 # TODO: NEED TO DECIDE IF THERE ARE ANY PARAMTERS
 CMD /usr/src/robotSimulator/bin/robotSimulator -a ${NETWORK_ADDRESS} -p ${NETWORK_PORT}

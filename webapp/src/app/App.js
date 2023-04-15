@@ -33,7 +33,7 @@ export default function App()
          navigate( '/home' );
          setStartup( false );
       }
-   }, [startup]);
+   }, [startup, navigate]);
 
    return(
            <>

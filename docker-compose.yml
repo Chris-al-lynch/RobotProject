@@ -15,8 +15,11 @@ services:
         - NETWORK_PORT=6000
     ports:
       - "6666:6666"
-    networks:
-      - robot
+    healthcheck:
+      # TODO: Write a test message interface to verify it's operational and replace ps with that.
+      test: ps -C robotSimulator > /dev/null || exit 1
+      timeout: 30s
+      retries: 10
   
   # This is the interface between the webapp and the robot.
   interface:
@@ -26,15 +29,21 @@ services:
       dockerfile: ./interface/Dockerfile.interface
     ports: 
       - "5555:5555"
-    networks:
-      - mysql
-      - robot
-      - interface
+    depends_on:
+      mysql:
+        condition: service_healthy
+      simulator:
+        condition: service_healthy
+    healthcheck:
+      # TODO: Write a test message interface to verify it's operational and replace ps with that.
+      # TODO: Process doesn't stay running yet.  Fix this when process is changed to a service.
+      test: ps -C java > /dev/null || exit 1
+      timeout: 30s
+      retries: 10
   
   # Container for storing webapp data.  This will contain configuration
   # information which will be shared with the interface container.
   mysql:
-    #image: mysql:latest
     image: robot/mysql
     build:
       context: .
@@ -50,9 +59,28 @@ services:
     volumes:
       - "./mysql/dbSchema.sql:/docker-entrypoint-initdb.d/dbSchema.sql"
       - dbvolume:/virtual/data/mysql
-    networks:
-      - mysql
-    
+    healthcheck:
+      test: mysqladmin ping -h mysql
+      timeout: 30s
+      retries: 10
+ 
+  backend:
+    image: robot/backend
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.backend
+      args:
+        - BACKEND_PORT=8888
+    ports:
+      - 8888:8888
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail http://backend:8888/Robot > /dev/null || exit 1
+      timeout: 30s
+      retries: 10
+
   # Container for running the webapp that interfaces with the
   # database and the robot interface software.
   webapp:
@@ -61,15 +89,19 @@ services:
       context: .
       dockerfile: ./webapp/Dockerfile.webapp
     ports:
-      - 3000:3000
-    networks:
-      - mysql
+      - 3333:3333
+    depends_on:
+      backend:
+        condition: service_healthy
+      # TODO: Uncomment this when interface is operational.
+      #interface:
+        #condition: service_healthy
+    healthcheck:
+      test: curl --fail http://webapp:3333 > /dev/null || exit 1
+      timeout: 30s
+      retries: 10
 
 # Create a docker volume in a docker container.
 volumes:
    dbvolume:
   
-networks:
-    mysql:
-    robot:
-    interface:
