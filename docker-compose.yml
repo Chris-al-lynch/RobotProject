@@ -4,17 +4,23 @@
 services:
 
   # We are not going to build a real robot at this time.  For now,
-  # I will build a robot simulator to 
+  # I will build a robot simulator.
   simulator:
+    # Name of image
     image: robot/simulator
+    # I want to use the dockerfile to build this image.
     build:
       context: .
       dockerfile: ./simulator/Dockerfile.simulator
       args:
-        - NETWORK_ADDRESS=robot
-        - NETWORK_PORT=6000
+          # Tell the simulator on which address to listen
+        - NETWORK_ADDRESS=simulator
+          # Tell the simulator on which port to listen
+        - NETWORK_PORT=6666
+    # Use this port for the network. <Port used by host machine>:<port used by Docker container>
     ports:
       - "6666:6666"
+    # Make sure the process is healthy before continuing.
     healthcheck:
       # TODO: Write a test message interface to verify it's operational and replace ps with that.
       test: ps -C robotSimulator > /dev/null || exit 1
@@ -23,17 +29,23 @@ services:
   
   # This is the interface between the webapp and the robot.
   interface:
+    # Name of image
     image: robot/interface
+    # I want to use the dockerfile to build this image.
     build:
       context: .
       dockerfile: ./interface/Dockerfile.interface
+    # Use this port for the network. <Port used by host machine>:<port used by Docker container>
     ports: 
       - "5555:5555"
+    # Set dependencies for this process to start.  This process will not attempt
+    # to start until mysql and the simulator are both healthy.
     depends_on:
       mysql:
         condition: service_healthy
       simulator:
         condition: service_healthy
+    # Make sure the process is healthy before continuing.
     healthcheck:
       # TODO: Write a test message interface to verify it's operational and replace ps with that.
       # TODO: Process doesn't stay running yet.  Fix this when process is changed to a service.
@@ -44,59 +56,90 @@ services:
   # Container for storing webapp data.  This will contain configuration
   # information which will be shared with the interface container.
   mysql:
+    # Name of image
     image: robot/mysql
+    # I want to use the dockerfile to build this image.
     build:
       context: .
       dockerfile: ./mysql/Dockerfile.mysql
+      # Arguments to use in the dockerfile.
       args:
         - MYSQL_DATABASE=configDB
         - MYSQL_USER=configUser
         - MYSQL_PASSWORD=configUserPassword1
         - MYSQL_ROOT_PASSWORD=rootPassword1
+    # Use this port for the network. <Port used by host machine>:<port used by Docker container>
     ports:
       - "3306:3306"
+    # Always restart if the process dies.
     restart: always
+    # The first item in this list 
     volumes:
       - "./mysql/dbSchema.sql:/docker-entrypoint-initdb.d/dbSchema.sql"
       - dbvolume:/virtual/data/mysql
+    # Make sure the process is healthy before continuing.
     healthcheck:
       test: mysqladmin ping -h mysql
       timeout: 30s
       retries: 10
  
+  # Container for the webapp backend.  This container is the interface between
+  # the webapp and the database.
   backend:
+    # Name of image
     image: robot/backend
+    # I want to use the dockerfile to build this image.
     build:
       context: .
       dockerfile: ./backend/Dockerfile.backend
       args:
+          # Tell the backedn on which address to listen.
+        - BACKEND_ADDRESS=backend
+          # Tell the backend on which port to listen.
         - BACKEND_PORT=8888
+    # Use this port for the network. <Port used by host machine>:<port used by Docker container>
     ports:
       - 8888:8888
+    # Set dependencies for this process to start.  This process will not attempt
+    # to start until mysql is healthy.
     depends_on:
       mysql:
         condition: service_healthy
+    # Make sure the process is healthy before continuing.
     healthcheck:
-      test: curl --fail http://backend:8888/Robot > /dev/null || exit 1
+      # I'm using the curl command here to determine if the server is running.
+      test: curl --fail http://backend:8888/Robot || exit 1
       timeout: 30s
       retries: 10
 
   # Container for running the webapp that interfaces with the
   # database and the robot interface software.
   webapp:
+    # Name of image
     image: robot/webapp
+    # I want to use the dockerfile to build this image.
     build:
       context: .
       dockerfile: ./webapp/Dockerfile.webapp
+      args:
+          # Tell the backedn on which address to listen.
+        - FRONTEND_ADDRESS=webapp
+          # Tell the backend on which port to listen.
+        - FRONTEND_PORT=3333
+    # Use this port for the network. <Port used by host machine>:<port used by Docker container>
     ports:
       - 3333:3333
+    # Set dependencies for this process to start.  This process will not attempt
+    # to start until the backend and interface are both healthy.
     depends_on:
       backend:
         condition: service_healthy
       # TODO: Uncomment this when interface is operational.
       #interface:
         #condition: service_healthy
+    # Make sure the process is healthy before continuing.
     healthcheck:
+      # I'm using the curl command here to determine if the server is running.
       test: curl --fail http://webapp:3333 > /dev/null || exit 1
       timeout: 30s
       retries: 10
