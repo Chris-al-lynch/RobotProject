@@ -1,5 +1,5 @@
-#ifndef _MESSAGE_QUEUE_H_
-#define _MESSAGE_QUEUE_H_
+#ifndef _RESPONSE_QUEUE_H_
+#define _RESPONSE_QUEUE_H_
 
 #include <mutex>
 #include <queue>
@@ -10,25 +10,25 @@
 
 using namespace std;
 
-class MessageQueue : public MessageQueueInterface
+class ResponseQueue : public MessageQueueInterface
 {
     private:
-       queue<messageTransfer_t> *messageQueue;
+       queue<messageTransfer_t> *responseQueue;
        mutex *queueLock;
        counting_semaphore<1> *semaphore;
 
-       static MessageQueue *instance;
-       MessageQueue();
+       static ResponseQueue *instance;
+
+       ResponseQueue();
 
     public:
-       ~MessageQueue();
+       ~ResponseQueue();
+
        /* Singleton should not be cloneable */
-       MessageQueue( MessageQueue &other ) = delete;
+       ResponseQueue( ResponseQueue &other ) = delete;
        /* Singleton should not be assignable */
-       void operator=( const MessageQueue & ) = delete;
-
-       static MessageQueue *getInstance();
-
+       void operator=( const ResponseQueue & ) = delete;
+       static ResponseQueue *getInstance();
        void addMessage( messageTransfer_t msg ) override;
        void retrieveMessage( messageTransfer_t *msg ) override;
 };

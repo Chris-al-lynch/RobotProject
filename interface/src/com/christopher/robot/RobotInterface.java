@@ -1,9 +1,10 @@
 package com.christopher.robot;
 
 import com.christopher.robot.client.Client;
-import com.christopher.robot.message.Message;
+import com.christopher.robot.message.Response;
 import com.christopher.robot.message.TestMessage;
-import com.christopher.robot.message.TestResponse;
+import com.christopher.robot.message.TestMessageId;
+import com.christopher.robot.message.TestMessageResponse;
 
 /**
  */
@@ -89,8 +90,9 @@ class RobotInterface
         try
         {
             Client client = new Client( address, port );
-            Message response = client.sendMessage( new TestMessage( testMessage ) );
-            String responseMessage = ((TestResponse)response).getResponse();
+            Response response = client.sendMessage( new TestMessage( TestMessageId.TEST_MESSAGE_STRING,
+                                                                     testMessage ) );
+            String responseMessage = ((TestMessageResponse)response).getMessage();
             System.out.println( "Server returned: " + responseMessage );
         }
         catch( Exception e )

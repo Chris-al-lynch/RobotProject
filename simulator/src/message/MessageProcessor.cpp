@@ -1,22 +1,29 @@
-#include <iostream>
 
 #include "Exceptions.h"
 #include "Message.h"
+#include "MessageFactory.h"
+#include "MessageHeader.h"
 #include "MessageProcessor.h"
+#include "MessageTrailer.h"
 #include "TestMessage.h"
+
+using namespace std;
 
 MessageProcessor::MessageProcessor()
 {
     logger = new Logger();
     processorThread = new jthread( MessageProcessor::processor, this );
     messageQueue = MessageQueue::getInstance();
+    responseQueue = ResponseQueue::getInstance();
 }
 
-void
-MessageProcessor::start()
+
+MessageProcessor::~MessageProcessor()
 {
     delete processorThread;
     delete messageQueue;
+    delete responseQueue;
+    delete logger;
 }
 
 void
@@ -35,29 +42,24 @@ MessageProcessor::processor( MessageProcessor *this_p )
             /* Wait for a message to be sent */
             this_p->messageQueue->retrieveMessage( &message );
 
-            if( message.msgBuffer == nullptr )
+            if( message.buffer == nullptr )
             {
                 close( message.connection );
                 continue;
             }
 
-            message.respBuffer = this_p->processMessage( message.msgBuffer );
-            if( message.respBuffer != nullptr )
+            //this_p->logger->logInfo( message.buffer->toString() );
+
+            message.buffer = this_p->processMessage( message.buffer );
+
+            if( message.buffer != nullptr )
             {
-                cout << "Adding reponse to message queue." << endl;
-                this_p->messageQueue->addResponse( message );
+                this_p->responseQueue->addMessage( message );
             }
             else
             {
-                cout << "No response buffer, closing connection." << endl;
                 close( message.connection );
                 message.connection = -1;
-
-                if( message.msgBuffer != nullptr )
-                {
-                    free( message.msgBuffer );
-                    message.msgBuffer = nullptr;
-                }
             }
         }
         catch( const exception& e )
@@ -67,9 +69,9 @@ MessageProcessor::processor( MessageProcessor *this_p )
                 close( message.connection );
             }
 
-            if( message.msgBuffer != nullptr )
+            if( message.buffer != nullptr )
             {
-                free( message.msgBuffer );
+                free( message.buffer );
             }
 
             this_p->logger->logError( "A failure occurred while processing a message: "
@@ -78,45 +80,17 @@ MessageProcessor::processor( MessageProcessor *this_p )
     } while( true );
 }
 
-char *
-MessageProcessor::processMessage( char *messageBuffer )
+RawBuffer *
+MessageProcessor::processMessage( RawBuffer *messageBuffer )
 {
-    Message message( messageBuffer );
+    Message  *message  = MessageFactory::unpack( messageBuffer );
+    Response *response = message->processMessage();
 
-    cout << "Called MessageProcessor::processMessage" << endl;
+    RawBuffer *responseBuffer = new RawBuffer( response->getHeader()->getLength() );
+    response->pack( responseBuffer );
 
-    if( !message.isMessageValid() )
-    {
-        throw MessageException( "Invalid message received" );
-    }
+    delete message;
+    delete response;
 
-    switch( message.getType() )
-    {
-        case TEST_MESSAGE:
-        {
-            cout << "have a test message." << endl;
-            TestMessage tm( messageBuffer );
-            logger->logInfo( "Test Message received with id = "
-                           + to_string( tm.getId() ) );
-            return tm.processMessage();
-        }
-        case MOVEMENT_MESSAGE:
-        {
-            cout << "have a movement message." << endl;
-            break;
-        }
-        case SENSE_MESSAGE:
-        {
-            cout << "have a sense message." << endl;
-            break;
-        }
-        default:
-        {
-            cout << "have an unexpected message." << endl;
-            logger->logInfo( "An unexpected message received." );
-            break;
-        }
-    }
-
-    return nullptr;
+    return responseBuffer;
 }

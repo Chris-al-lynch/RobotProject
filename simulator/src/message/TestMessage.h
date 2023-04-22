@@ -2,18 +2,27 @@
 #define _TEST_MESSAGE_H_
 
 #include "Message.h"
+#include "RawBuffer.h"
+#include "TestMessageResponse.h"
 
 using namespace std;
 
 class TestMessage : public Message
 {
     private:
+        static const int TEST_MESSAGE_VERSION = 0;
+        string message;
+        TestMessage();
+        
     public:
-        TestMessage( char *messageBuffer );
-        char *processMessage();
-        char *generateTestMessage( string message );
-        static char *generateTestResponse( string message, int id );
-        bool operator!=( TestMessage &msg1 );
+        TestMessage( string message );
+        ~TestMessage();
+
+        string getMessage();
+
+        TestMessageResponse *processMessage() override;
+        void pack( RawBuffer *buffer ) override;
+        static TestMessage *unpack( RawBuffer *buffer );
 };
 
 #endif

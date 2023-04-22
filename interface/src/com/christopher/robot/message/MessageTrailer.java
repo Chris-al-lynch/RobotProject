@@ -2,12 +2,10 @@ package com.christopher.robot.message;
 
 import java.nio.ByteBuffer;
 
-import com.christopher.robot.utilities.PrintUtilities;
-
 public class MessageTrailer
 {
     private int marker;
-    private static final int TRAILER_MARKER = 0X0DADBAD0;
+    private static final int TRAILER_MARKER = 0XDAD00BAD;
 
     public MessageTrailer()
     {
@@ -19,35 +17,21 @@ public class MessageTrailer
         return Integer.BYTES;
     }
 
-    public static MessageTrailer getTrailerFromBuffer( byte[] buffer, int location ) throws MessageException
+    public static MessageTrailer unpack( ByteBuffer buffer ) throws MessageException
     {
-        ByteBuffer wrapper = ByteBuffer.wrap( buffer );
-        return getTrailerFromBuffer( wrapper,  location ) ;
-    }
+        int trailerIndex  = buffer.getInt( 0 ) - Integer.BYTES;
+        int trailerMarker = buffer.getInt( trailerIndex );
 
-    public static MessageTrailer getTrailerFromBuffer( ByteBuffer buffer, int location ) throws MessageException
-    {
-        int buffMarker = buffer.getInt( location );
-
-        PrintUtilities.printByteArray( buffer.array() );
-
-        System.out.println( "Trailer marker = " + String.format( "0x%08X", buffMarker ) );
-        System.out.println( "Trailer marker 2 = " + buffMarker );
-
-        if( buffMarker != TRAILER_MARKER )
+        if( trailerMarker != TRAILER_MARKER )
         {
-            throw new MessageException( "Invalid trailer marker in buffer." );
+            throw new MessageException( "Buffer does not contain a valid trailer" );
         }
-       
+
         return new MessageTrailer();
     }
 
-    public byte[] pack()
+    public void pack( ByteBuffer buffer )
     {
-        ByteBuffer packedBuffer = ByteBuffer.allocate( 4 );
-
-        packedBuffer.putInt( marker );
-
-        return packedBuffer.array();
+        buffer.putInt( marker );
     }
 }

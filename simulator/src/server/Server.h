@@ -1,22 +1,15 @@
 #ifndef _SERVER_H_
 #define _SERVER_H_
 
-#include <netinet/in.h>
-
 #include <thread>
 
 #include "Logger.h"
 #include "MessageProcessor.h"
 #include "MessageQueue.h"
+#include "RawBuffer.h"
+#include "TcpServer.h"
 
 using namespace std;
-
-typedef enum commType
-{
-    READ,
-    WRITE,
-    EXCEPTION
-} commType;
 
 /**
  * The robot needs a way to receive commands from the user.  This class is
@@ -26,20 +19,20 @@ typedef enum commType
 class Server
 {
     private: 
-       typedef int clientSocket;
-       typedef struct timeval timeval_t;
+       /* Object for performing TCP related tasks. */
+       TcpServer *tcpServer;
 
-       /* Address on which to listen. */
-       string listenAddress;
-       /* Port on which to listen. */
-       int listenPort;
-       /* Socket file descriptor. */
-       int serverSocket;
-       /* Socket Address */
-       sockaddr_in socketAddress;
-       /* Message Queue */
+       /* Queue to add messages for processing */
        MessageQueue *messageQueue;
+       /* Queue for retrieving responses for processed messages. */
+       ResponseQueue *responseQueue;
+
+       /* Object for processing messages. */
        MessageProcessor *messageProcessor;
+
+       /* Thread for monitoring the response queue and sending responses back
+        * to the sender.
+        */
        jthread *responseThread;
 
        /* I always create a logger class in case I want to change
@@ -47,16 +40,17 @@ class Server
         */
        Logger *logger;
 
-       /* Queue the work. */
-       void dispatch( clientSocket connection, char *msgBuffer );
+       /* Variable used to determine if we should stop processing.  The Stop
+        * method will set this to true.
+        */
+       bool stopProcessing;
 
-       void initSocket();
-       void startListener();
-       void block( commType type, timeval_t *timeout );
-       clientSocket acceptConnection();
-       char *receiveRequest( clientSocket connection );
-       void sendResponse( clientSocket connection, char *response );
+       /* Method for sending messages off to be processed. */
+       void dispatch( clientSocket_t connection, RawBuffer *msgBuffer );
+
+       /* Method for sending responses back to the sender. */
        void processResponse();
+
 
     public:
         /**

@@ -21,6 +21,7 @@ parseArgs( int argc, char *argv[] )
 {
     string usage = "server -a <address> -p <port number>";
     arguments args;
+    args.port = -1;
     int opt;
 
     while( (opt=getopt( argc, argv, "p:a:" )) )
@@ -50,9 +51,15 @@ parseArgs( int argc, char *argv[] )
         }
     }
 
+    if( (args.port == -1) || (args.address.empty()) )
+    {
+        cout << usage << endl << endl;
+        cout << "Must specify both listen address and listen port" << endl;
+        exit( EXIT_FAILURE );
+    }
+
     return args;
 }
-
 
 int
 main( int argc, char *argv[] )

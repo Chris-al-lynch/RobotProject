@@ -7,8 +7,7 @@ public enum MessageType
     INVALID_MESSAGE    (0),
     MOVEMENT_MESSAGE   (1),
     SENSE_MESSAGE      (2),
-    TEST_MESSAGE       (3),
-    TEST_RESPONSE      (4);
+    TEST_MESSAGE       (3);
 
     private final int value;
     private static HashMap<Integer, MessageType> map = new HashMap<>();

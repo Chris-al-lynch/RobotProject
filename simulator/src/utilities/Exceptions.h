@@ -5,6 +5,7 @@
 #include <exception>
 #include <string>
 
+#include <iostream>
 using namespace std;
 
 class ServerException : public exception
@@ -18,6 +19,28 @@ class ServerException : public exception
     public:
        ServerException( const string& msg, int error = -1) : error( error ), message( msg ) {};
        ServerException( const char *msg, int error = -1 ) : error( error ), message( msg ) {};
+
+       int getError()
+       {
+           return error;
+       }
+       const char *what() const throw ()
+       {
+           return message.c_str();
+       }
+};
+
+class TcpException : public exception
+{
+    private:
+       int error = -1;
+
+    protected:
+        string message;
+
+    public:
+       TcpException( const string& msg, int error = -1) : error( error ), message( msg ) {};
+       TcpException( const char *msg, int error = -1 ) : error( error ), message( msg ) {};
 
        int getError()
        {
@@ -62,4 +85,33 @@ class MessageException : public exception
        }
 };
 
+class InvalidParameterException : public exception
+{
+    private:
+        string message;
+
+    public:
+       InvalidParameterException( const string& msg ) : message( msg ) { cout << "In the exception" << endl; }
+       InvalidParameterException( const char *msg ) : message( msg ) { cout << "In the exception" << endl; }
+
+       const char *what() const throw ()
+       {
+           return message.c_str();
+       }
+};
+
+class BufferOverflowException : public exception
+{
+    private:
+        string message;
+
+    public:
+       BufferOverflowException( const string& msg ) : message( msg ) {};
+       BufferOverflowException( const char *msg ) : message( msg ) {};
+
+       const char *what() const throw ()
+       {
+           return message.c_str();
+       }
+};
 #endif

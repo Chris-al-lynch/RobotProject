@@ -1,58 +1,31 @@
-#ifndef _MESSAGE_H_
-#define _MESSAGE_H_
+#ifndef __MESSAGE_H__
+#define __MESSAGE_H__
 
-#include "Logger.h"
+#include "MessageHeader.h"
+#include "MessageTrailer.h"
+#include "RawBuffer.h"
+#include "Response.h"
 
 using namespace std;
 
-typedef enum messageType
-{
-   INVALID_MESSAGE  = 0,
-   MOVEMENT_MESSAGE = 1,
-   SENSE_MESSAGE    = 2,
-   TEST_MESSAGE     = 3,
-   TEST_RESPONSE    = 4
-} messageType_t;
-
 class Message
 {
-    private:
-        static int messageIdentifier;
-        static const int MSG_HEADER_MARKER = 0x0BADDAD0;
-        static const int MSG_TRAILER_MARKER = 0x0DADBAD0;
-
     protected:
-        typedef struct msgHeader
-        {
-            int msgLength;
-            int msgType;
-            int id;
-            int marker;
-        } msgHeader;
+        MessageHeader *header;
+        MessageTrailer *trailer;
 
-        typedef struct msgTrailer
-        {
-            int marker;
-        } msgTrailer;
-
-        char *messageBuffer;
-
-        Logger *logger;
-        static int getMessageIdForNewMessage();
-
-        static void generateMessageHeader( msgHeader *hdr, int length,
-                                           messageType_t type );
-        static void generateResponseHeader( msgHeader *hdr, int length,
-                                            messageType_t type, int id );
-        static void generateTrailer( msgTrailer *trailer );
+        Message();
+        Message( int dataLength, int type, int id, int sequenceId, int version );
+        Message( int dataLength, int type, int id, int version );
 
     public:
-        Message( char *messageBuffer );
-        messageType_t getType();
-        int getId();
-        int getLength();
-        bool isMessageValid();
-        virtual char *processMessage(){ return nullptr; }
+       ~Message();
+        MessageHeader *getHeader();
+        MessageTrailer *getTrailer();
+
+        virtual Response *processMessage() = 0;
+        virtual void pack( RawBuffer *buffer ) = 0;
+       
 };
 
 #endif

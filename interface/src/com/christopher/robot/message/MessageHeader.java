@@ -1,91 +1,95 @@
 package com.christopher.robot.message;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 public class MessageHeader
 {
-    private int msgLength;
-    private MessageType msgType;
+    private static int NewSequenceID;
+    private int length;
+    private int type;
     private int id;
+    private int sequenceId;
+    private int version;
     private int marker;
-    private static final int HEADER_MARKER = 0x0BADDAD0;
+    private static final int HEADER_MARKER = 0xBAD00DAD;
 
-    protected void chageType( MessageType newType )
+    public MessageHeader( int length, int type, int id,
+                           int version )
     {
-        msgType = newType;
+        this( length, type, id, ++NewSequenceID, version );
     }
 
-    public MessageHeader( int msgLength, MessageType msgType, int id )
+    public MessageHeader( int length, int type, int id, int sequenceId,
+                           int version )
     {
-        this.msgLength = msgLength;
-        this.msgType   = msgType;
-        this.id        = id;
-        this.marker    = HEADER_MARKER;
-        System.out.println( "msgLength = " + msgLength );
+        this.length     = length;
+        this.type       = type;
+        this.id         = id;
+        this.sequenceId = sequenceId;
+        this.version    = version;
+        this.marker     = HEADER_MARKER;
     }
 
-    public static MessageHeader getHeaderFromBuffer( byte[] buffer,
-                                                     ByteOrder order ) throws MessageException
+    public static int getSize()
     {
-        ByteBuffer wrapped = ByteBuffer.wrap( buffer.clone() );
-        wrapped.order( order );
-        return getHeaderFromBuffer( wrapped );
+        return 6 * Integer.BYTES;
     }
 
-    public static MessageHeader getHeaderFromBuffer( ByteBuffer buffer ) throws MessageException
+    public int getLength()
     {
-        int msgLength = buffer.getInt();
-        int msgType   = buffer.getInt();
-        int id        = buffer.getInt();
-        int marker    = buffer.getInt();
+        return length;
+    }
 
-        System.out.println( "msgLength = " + msgLength
-                          + ", msgType = " + msgType
-                          + ", id = " + id
-                          + ", marker = " + String.format( "0x%X", marker ) );
-        
+    public int getType()
+    {
+        return type;
+    }
+
+    public int getId()
+    {
+        return id;
+    }
+
+    public int getSequenceId()
+    {
+        return sequenceId;
+    }
+
+    public int getVersion()
+    {
+        return version;
+    }
+
+    public void pack( ByteBuffer buffer )
+    {
+        buffer.putInt( length );
+        buffer.putInt( type );
+        buffer.putInt( id );
+        buffer.putInt( sequenceId );
+        buffer.putInt( version );
+        buffer.putInt( marker );
+    }
+
+    public static MessageHeader unpack( ByteBuffer buffer )
+                                                         throws MessageException
+    {
+        int currentPosition = buffer.position();
+        buffer.rewind();
+
+        int length  = buffer.getInt();
+        int type    = buffer.getInt();
+        int id      = buffer.getInt();
+        int sequenceId = buffer.getInt();
+        int version = buffer.getInt();
+        int marker  = buffer.getInt();
+
+        buffer.position( currentPosition );
 
         if( marker != HEADER_MARKER )
         {
             throw new MessageException( "Invalid Buffer...Marker invalid: " + marker );
         }
 
-        MessageHeader header = new MessageHeader( msgLength, MessageType.getType( msgType ), id );
-
-        return header;
-    }
-
-
-    public static int getSize()
-    {
-        return 4 * Integer.BYTES;
-    }
-
-    public byte[] pack()
-    {
-        ByteBuffer packedBuffer = ByteBuffer.allocate( 4 * Integer.BYTES );
-
-        packedBuffer.putInt( msgLength );
-        packedBuffer.putInt( msgType.getValue() );
-        packedBuffer.putInt( id );
-        packedBuffer.putInt( marker );
-
-        return packedBuffer.array();
-    }
-
-    public int getMsgLength()
-    {
-        return msgLength;
-    }
-
-    public MessageType getMsgType()
-    {
-        return msgType;
-    }
-
-    public int getMsgId()
-    {
-        return id;
+        return new MessageHeader( length, type, id, sequenceId, version );
     }
 }

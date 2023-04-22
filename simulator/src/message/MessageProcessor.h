@@ -5,6 +5,8 @@
 
 #include "Logger.h"
 #include "MessageQueue.h"
+#include "RawBuffer.h"
+#include "ResponseQueue.h"
 
 using namespace std;
 
@@ -14,16 +16,15 @@ class MessageProcessor
         Logger *logger;
         jthread *processorThread;
         MessageQueue *messageQueue;
+        ResponseQueue *responseQueue;
         
         static void processor( MessageProcessor *this_p );
-        char *processMessage( char *messageBuffer );
+        RawBuffer *processMessage( RawBuffer *messageBuffer );
 
     public:
         MessageProcessor();
         ~MessageProcessor();
         void start();
-
-
 };
 
 #endif
