@@ -28,7 +28,7 @@ TestMessage::getMessage()
 }
 
 TestMessageResponse *
-TestMessage::processMessage()
+TestMessage::processMessage( MessageProcessor *unused )
 {
     return new TestMessageResponse( TEST_RESPONSE_SUCCESS,
                                     "Received message: " + message );

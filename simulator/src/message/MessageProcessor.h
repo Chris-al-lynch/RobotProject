@@ -7,6 +7,7 @@
 #include "MessageQueue.h"
 #include "RawBuffer.h"
 #include "ResponseQueue.h"
+#include "Status.h"
 
 using namespace std;
 
@@ -17,14 +18,25 @@ class MessageProcessor
         jthread *processorThread;
         MessageQueue *messageQueue;
         ResponseQueue *responseQueue;
+        Status status;
+        friend class Message;
         
         static void processor( MessageProcessor *this_p );
         RawBuffer *processMessage( RawBuffer *messageBuffer );
 
+    protected:
+        void (*moveFunction)( int direction, unsigned int amount );
+        void (*stopFunction)();
+
     public:
         MessageProcessor();
         ~MessageProcessor();
-        void start();
+
+        void registerMoveFunction( void (*moveFunction)( int direction,
+                                                         unsigned int amount ) );
+        void registerStopFunction( void (*stopFunction)() );
+
+        Status getStatus();
 };
 
 #endif

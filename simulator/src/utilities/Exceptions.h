@@ -114,4 +114,20 @@ class BufferOverflowException : public exception
            return message.c_str();
        }
 };
+
+class MotorException : public exception
+{
+    private:
+        string message;
+
+    public:
+       MotorException( const string& msg ) : message( msg ) {};
+       MotorException( const char *msg ) : message( msg ) {};
+
+       const char *what() const throw ()
+       {
+           return message.c_str();
+       }
+};
+
 #endif

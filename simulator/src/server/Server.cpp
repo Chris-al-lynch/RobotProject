@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <cstdlib>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -19,75 +20,91 @@ using namespace std;
 
 Server::Server( string listenAddress, int listenPort )
 {
-    logger = new Logger( LOGGER_DEBUG );
-    stopProcessing = false;
-    tcpServer = new TcpServer( listenAddress, listenPort );
+    status = STATUS_INITIALIZING;
 
-    responseThread = new jthread( &Server::processResponse, this );
-    messageProcessor = new MessageProcessor();
-    messageQueue  = MessageQueue::getInstance();
-    responseQueue = ResponseQueue::getInstance();
+    try
+    {
+        logger = new Logger( LOGGER_DEBUG );
+        stopProcessing = false;
+        tcpServer = new TcpServer( listenAddress, listenPort );
+
+        messageQueue  = MessageQueue::getInstance();
+        responseQueue = ResponseQueue::getInstance();
+
+        /* Make sure everything is initialized before the threads are started. */
+        responseThread = new jthread( &Server::processResponse, this );
+        serverThread   = new jthread( &Server::server, this );
+    }
+    catch( exception& e )
+    {
+        status = STATUS_FAILED;
+        throw e;
+    }
+
+    status = STATUS_FULLY_OPERATIONAL;
 }
 
 Server::~Server()
 {
-    delete logger;
-    delete messageQueue;
+    shutdown();
+}
+
+void
+Server::shutdown()
+{
+    delete tcpServer;
     delete responseQueue;
     delete responseThread;
-    delete tcpServer;
+    delete messageQueue;
+    delete logger;
 }
 
 void
-Server::start()
+Server::server()
 {
-    logger->logInfo( "Initializing socket." );
-
-    /* Initialize the socket. */
-    tcpServer->initSocket();
-
-    logger->logInfo( "Starting listener." );
-    /* Start the listener. */
-    tcpServer->startListener();
-
-    /* As long as the server is running, continue to loop.  Wait for and process
-     * new messages.
-     */
-
-    do
+    try
     {
-        logger->logInfo( "Accepting connection." );
+        logger->logInfo( "Initializing socket." );
 
-        /* Wait for a connection request from the client. Once the connection is
-         * established, it will remain open until the message has been processed
-         * and the response has been sent.
+        /* Initialize the socket. */
+        tcpServer->initSocket();
+
+        logger->logInfo( "Starting listener." );
+        /* Start the listener. */
+        tcpServer->startListener();
+
+        /* As long as the server is running, continue to loop.  Wait for and process
+         * new messages.
          */
-        clientSocket_t connection = tcpServer->acceptConnection();
 
-        logger->logInfo( "Retrieving message." );
-        /* Retrieve the message from the client. */
-        RawBuffer *msgBuffer = tcpServer->receiveRequest( connection );
+        do
+        {
+            logger->logInfo( "Accepting connection." );
 
-        logger->logInfo( "Processing message." );
-        /* Send the message to the worker to be processed.
-         * The response will be processed by a separate thread.
-         */
-        dispatch( connection, msgBuffer );
-    } while( !stopProcessing );
-}
+            /* Wait for a connection request from the client. Once the connection is
+             * established, it will remain open until the message has been processed
+             * and the response has been sent.
+             */
+            clientSocket_t connection = tcpServer->acceptConnection();
 
-void
-Server::stop()
-{
-    tcpServer->tcpClose();
+            logger->logInfo( "Retrieving message." );
+            /* Retrieve the message from the client. */
+            RawBuffer *msgBuffer = tcpServer->receiveRequest( connection );
 
-    if( responseThread != nullptr )
-    {
-        responseThread->request_stop();
-        responseThread->join();
+            logger->logInfo( "Processing message." );
+            /* Send the message to the worker to be processed.
+             * The response will be processed by a separate thread.
+             */
+            dispatch( connection, msgBuffer );
+        } while( true );
     }
-
-    stopProcessing = true;
+    catch( exception& e )
+    {
+        status = STATUS_FAILED;
+        logger->logError( "Server failed with: " + string( e.what() ) );
+        shutdown();
+        throw e;
+    }
 }
 
 void
@@ -99,32 +116,48 @@ Server::dispatch( clientSocket_t connection, RawBuffer *msgBuffer )
 void
 Server::processResponse()
 {
-    do
+    try
     {
-        logger->logInfo( "Waiting for a response to send." );
-        messageTransfer_t response;
-
-        /* Retrieve a response from the message queue. */
-        responseQueue->retrieveMessage( &response );
-
-        logger->logInfo( "Response received." );
-
-        if( response.buffer != nullptr )
+        do
         {
-            logger->logInfo( "Sending response." );
-            /* Send the response back on the client connection. */
-            tcpServer->sendResponse( response.connection, response.buffer );
+            logger->logInfo( "Waiting for a response to send." );
+            messageTransfer_t response;
 
-            /* Response Sent...Free the buffer. */
-            delete response.buffer;
-        }
-        else
-        {
-            logger->logInfo( "response buffer is NULL." );
-        }
+            /* Retrieve a response from the message queue. */
+            responseQueue->retrieveMessage( &response );
 
-        /* Response sent. Close the connection. */
-        close( response.connection );
+            logger->logInfo( "Response received." );
 
-    } while( true );
+            if( response.buffer != nullptr )
+            {
+                logger->logInfo( "Sending response." );
+                /* Send the response back on the client connection. */
+                tcpServer->sendResponse( response.connection, response.buffer );
+
+                /* Response Sent...Free the buffer. */
+                delete response.buffer;
+            }
+            else
+            {
+                logger->logInfo( "response buffer is NULL." );
+            }
+
+            /* Response sent. Close the connection. */
+            close( response.connection );
+
+        } while( true );
+    }
+    catch( exception& e )
+    {
+        status = STATUS_FAILED;
+        logger->logError( "Process Response failed with: " + string( e.what() ) );
+        shutdown();
+        throw e;
+    }
+}
+
+Status
+Server::getStatus()
+{
+    return status;
 }

@@ -3,8 +3,8 @@
 
 using namespace std;
 
-MessageQueue *
-MessageQueue::instance = nullptr;
+MessageQueue *MessageQueue::instance;
+once_flag MessageQueue::instanceFlag;
 
 MessageQueue::MessageQueue()
 {
@@ -56,10 +56,6 @@ MessageQueue::retrieveMessage( messageTransfer_t *msg )
 MessageQueue *
 MessageQueue::getInstance()
 {
-    if( instance == nullptr )
-    {
-        instance = new MessageQueue();
-    }
-
+    call_once( instanceFlag, [&]() { instance = new MessageQueue(); } );
     return instance;
 }

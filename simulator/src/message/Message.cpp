@@ -43,3 +43,16 @@ Message::getTrailer()
 {
     return trailer;
 }
+
+void
+Message::moveFunction( MessageProcessor *messageProcessor,
+                       int direction, unsigned int amount )
+{
+    messageProcessor->moveFunction( direction, amount );
+}
+
+void
+Message::stopFunction( MessageProcessor *messageProcessor )
+{
+    messageProcessor->stopFunction();
+}

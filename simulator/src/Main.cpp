@@ -4,8 +4,10 @@
 #include <iostream>
 #include <cstring>
 #include <string>
+#include <unistd.h>
 
 #include "Exceptions.h"
+#include "Robot.h"
 #include "Server.h"
 
 using namespace std;
@@ -55,6 +57,8 @@ parseArgs( int argc, char *argv[] )
     {
         cout << usage << endl << endl;
         cout << "Must specify both listen address and listen port" << endl;
+        cout << "address = " << args.address << endl;
+        cout << "port = " << args.port << endl;
         exit( EXIT_FAILURE );
     }
 
@@ -68,9 +72,15 @@ main( int argc, char *argv[] )
 
     try
     {
-        Server server( args.address, args.port );
+        Robot *robot = Robot::getInstance( args.address, args.port );
 
-        server.start();
+        Status status = STATUS_FULLY_OPERATIONAL;
+
+        while( status != STATUS_FAILED )
+        {
+            status = robot->getStatus();
+            sleep( 1 );
+        }
     }
     catch( ServerException& se )
     {

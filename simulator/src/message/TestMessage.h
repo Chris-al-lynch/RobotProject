@@ -2,6 +2,7 @@
 #define _TEST_MESSAGE_H_
 
 #include "Message.h"
+#include "MessageProcessor.h"
 #include "RawBuffer.h"
 #include "TestMessageResponse.h"
 
@@ -20,7 +21,7 @@ class TestMessage : public Message
 
         string getMessage();
 
-        TestMessageResponse *processMessage() override;
+        TestMessageResponse *processMessage( MessageProcessor *messageProcessor ) override;
         void pack( RawBuffer *buffer ) override;
         static TestMessage *unpack( RawBuffer *buffer );
 };

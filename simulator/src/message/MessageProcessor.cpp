@@ -27,64 +27,85 @@ MessageProcessor::~MessageProcessor()
 }
 
 void
+MessageProcessor::registerMoveFunction( void (*moveFunction)( int direction,
+                                                              unsigned int amount ) )
+{
+    this->moveFunction = moveFunction;
+}
+
+void
+MessageProcessor::registerStopFunction( void (*stopFunction)() )
+{
+    this->stopFunction = stopFunction;
+}
+
+void
 MessageProcessor::processor( MessageProcessor *this_p )
 {
-    this_p->logger->logInfo( "Message processor thread started." );
-
-    do
+    try
     {
-        messageTransfer_t message;
-        memset( &message, 0, sizeof( message ) );
-        message.connection = -1;
+        this_p->logger->logInfo( "Message processor thread started." );
 
-        try
+        do
         {
-            /* Wait for a message to be sent */
-            this_p->messageQueue->retrieveMessage( &message );
+            messageTransfer_t message;
+            memset( &message, 0, sizeof( message ) );
+            message.connection = -1;
 
-            if( message.buffer == nullptr )
+            try
             {
-                close( message.connection );
-                continue;
+                /* Wait for a message to be sent */
+                this_p->messageQueue->retrieveMessage( &message );
+
+                if( message.buffer == nullptr )
+                {
+                    close( message.connection );
+                    continue;
+                }
+
+                message.buffer = this_p->processMessage( message.buffer );
+
+                if( message.buffer != nullptr )
+                {
+                    this_p->responseQueue->addMessage( message );
+                }
+                else
+                {
+                    close( message.connection );
+                    message.connection = -1;
+                }
             }
-
-            //this_p->logger->logInfo( message.buffer->toString() );
-
-            message.buffer = this_p->processMessage( message.buffer );
-
-            if( message.buffer != nullptr )
+            catch( const exception& e )
             {
-                this_p->responseQueue->addMessage( message );
-            }
-            else
-            {
-                close( message.connection );
-                message.connection = -1;
-            }
-        }
-        catch( const exception& e )
-        {
-            if( message.connection != -1 )
-            {
-                close( message.connection );
-            }
+                if( message.connection != -1 )
+                {
+                    close( message.connection );
+                }
 
-            if( message.buffer != nullptr )
-            {
-                free( message.buffer );
-            }
+                if( message.buffer != nullptr )
+                {
+                    free( message.buffer );
+                }
 
-            this_p->logger->logError( "A failure occurred while processing a message: "
-                                    + string( e.what() ) );
-        }
-    } while( true );
+                this_p->logger->logError( "A failure occurred while processing a message: "
+                                        + string( e.what() ) );
+            }
+        } while( true );
+    }
+    catch( exception& e )
+    {
+        this_p->status = STATUS_FAILED;
+        this_p->logger->logError( "MessageProcessor failed with: " + string( e.what() ) );
+        throw e;
+    }
 }
 
 RawBuffer *
 MessageProcessor::processMessage( RawBuffer *messageBuffer )
 {
     Message  *message  = MessageFactory::unpack( messageBuffer );
-    Response *response = message->processMessage();
+
+    Response *response = message->processMessage( this );
 
     RawBuffer *responseBuffer = new RawBuffer( response->getHeader()->getLength() );
     response->pack( responseBuffer );
@@ -93,4 +114,10 @@ MessageProcessor::processMessage( RawBuffer *messageBuffer )
     delete response;
 
     return responseBuffer;
+}
+
+Status
+MessageProcessor::getStatus()
+{
+    return status;
 }

@@ -79,9 +79,13 @@ services:
       - dbvolume:/virtual/data/mysql
     # Make sure the process is healthy before continuing.
     healthcheck:
+      # With the running of the initialization script, the database
+      # starts temporarily to run the schema init script, then shuts down,
+      # then starts again for normal running.  This takes extra time.
+      # Make sure there is lots of time for the database to respond.
       test: mysqladmin ping -h mysql
-      timeout: 30s
-      retries: 10
+      timeout: 60s
+      retries: 20
  
   # Container for the webapp backend.  This container is the interface between
   # the webapp and the database.

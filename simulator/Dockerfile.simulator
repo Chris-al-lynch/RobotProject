@@ -1,6 +1,9 @@
 # The simulator will simulate the robot.  This will be written in C++.
 FROM ubuntu:latest
 
+ARG NETWORK_ADDRESS
+ARG NETWORK_PORT
+
 # Copy the source to the container.
 COPY ./simulator /usr/src/robotSimulator
 
@@ -29,7 +32,10 @@ RUN /usr/bin/cmake --build .
 
 EXPOSE 6666
 
+RUN ls /usr/src/robotSimulator
+
+ENV CMD_NETWORK_ADDRESS=${NETWORK_ADDRESS}
+ENV CMD_NETWORK_PORT=${NETWORK_PORT}
+
 # Run the code.
-# TODO: NEED TO DECIDE IF THERE ARE ANY PARAMTERS
-CMD /usr/src/robotSimulator/bin/robotSimulator -a ${NETWORK_ADDRESS} -p ${NETWORK_PORT}
-#CMD "/bin/bash -c 'while true; do sleep 1; done'
+CMD /usr/src/robotSimulator/bin/robotSimulator -a ${CMD_NETWORK_ADDRESS} -p ${CMD_NETWORK_PORT}

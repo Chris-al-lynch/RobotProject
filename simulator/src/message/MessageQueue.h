@@ -17,7 +17,9 @@ class MessageQueue : public MessageQueueInterface
        mutex *queueLock;
        counting_semaphore<1> *semaphore;
 
+       static once_flag instanceFlag;
        static MessageQueue *instance;
+
        MessageQueue();
 
     public:

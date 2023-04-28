@@ -8,6 +8,8 @@ list( APPEND SOURCES
       "${DIRECTORY}/MessageProcessor.cpp"
       "${DIRECTORY}/MessageQueue.cpp"
       "${DIRECTORY}/MessageTrailer.cpp"
+      "${DIRECTORY}/MoveMessage.cpp"
+      "${DIRECTORY}/MoveMessageResponse.cpp"
       "${DIRECTORY}/Response.cpp"
       "${DIRECTORY}/ResponseQueue.cpp"
       "${DIRECTORY}/TestMessage.cpp"

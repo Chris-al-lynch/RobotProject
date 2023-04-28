@@ -1,0 +1,18 @@
+FROM python:latest
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+ARG BACKEND_PORT
+
+COPY ./backend/requirements.txt /
+RUN pip install -r /requirements.txt
+
+#RUN django-admin startproject backend
+COPY ./backend /backend
+
+WORKDIR /backend/robot
+
+EXPOSE 8888
+
+CMD python manage.py migrate && python manage.py makemigrations robotbackend && python manage.py migrate && python manage.py runserver backend:8888
