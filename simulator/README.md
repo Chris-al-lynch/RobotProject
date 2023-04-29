@@ -1,17 +1,16 @@
-C++ concepts found here: classes, Inheritance, Receiving messages and sending responses through a TCP socket as a server, Queues, mutexes, counting_semaphores, jthreads and using class methods as jthread functions.
+C++ concepts found here: classes, Inheritance, Receiving messages and sending responses through a TCP socket as a server, Queues, mutexes, counting_semaphores, jthreads and using class methods as jthread functions, pthread_mutex, pthread_create, Singleton classes.
 
-NOTE: There is a lot of cleanup that still needs to be done as well as commenting.  I will get to this as soon as possible.
-NOTE: I made some changes converting from big endian to little endian due to issues in the java code (see __builtin_bswap32()).  This will be removed when I fix the Java code.
+NOTE: There is a lot of cleanup that still needs to be done as well as commenting.  I will get to this eventually.
 
----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 This component is a simulator for a robot.  I don't have a real robot at the moment, so I am going to simulate a robot with software.  I would eventually like to hook up a webcam and simulate the robot having a camera and stream it back to the client/controller.
 
 Progress:
 
-This component was going to be one of the last ones I worked on.  However, I have a coding interview in C++ coming up and need some C++ practice.  So, I'm going to do some work on it now.
+At this point, I have written code to simulate robot motors as well as the infrastructure to receive messages and recover from errors.  I will go into more details about this on the github [wiki](https://github.com/Chris-al-lynch/RobotProject/wiki) for this project.  All documentation for this project will go into this wiki.
 
-I have written a TCP server which receives messages from a client, processes the message, and returns a response back to the sender.  I wrote a test client that sends a test message receives the response and validates that the response is correct.  However, this test client is currently broken since I made some change for the Java code.  I will remove those changes soon which will allow this test client to work again.  I will describe each of the classes used to develop this code.  I still need to go through and comment the code.  However, that will have to be done later.  I have a Java coding interview coming up soon, and I need to practice Java.  It's been awhile.
+For now, I will leave this documentation in place until the [wiki](https://github.com/Chris-al-lynch/RobotProject/wiki) is further along.
 
 utilities:
 
