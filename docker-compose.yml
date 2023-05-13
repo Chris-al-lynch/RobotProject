@@ -85,7 +85,7 @@ services:
       # Make sure there is lots of time for the database to respond.
       test: mysqladmin ping -h mysql
       timeout: 60s
-      retries: 20
+      retries: 40
  
   # Container for the webapp backend.  This container is the interface between
   # the webapp and the database.
