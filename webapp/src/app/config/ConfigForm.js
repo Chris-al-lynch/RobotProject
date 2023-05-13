@@ -8,8 +8,10 @@ import { addNewConfig } from '../backend/backend'
 export default function ConfigForm()
 {
    const [name, setName] = useState( "" );
-   const [address, setAddress] = useState( "" );
-   const [port, setPort] = useState( "" );
+   const [interfaceAddress, setInterfaceAddress] = useState( "" );
+   const [interfacePort, setInterfacePort] = useState( "" );
+   const [robotAddress, setRobotAddress] = useState( "" );
+   const [robotPort, setRobotPort] = useState( "" );
    const [description, setDescription] = useState( "" );
    const [showSubmitConfirm, setShowSubmitConfirm] = useState( false );
    const [dataToSubmit, setDataToSubmit] = useState([]);
@@ -23,10 +25,12 @@ export default function ConfigForm()
       /* TODO: Validate the fields */
 
       console.log( "onSubmit()" )
-      setDataToSubmit( [ {key: 1, label: "name: ", value: name},
-                         {key: 2, label: "address: ", value: address},
-                         {key: 3, label: "port: ", value: port},
-                         {key: 4, label: "description: ", value: description} ] );
+      setDataToSubmit( [ {key: 1, label: "Name: ", value: name},
+                         {key: 2, label: "Interface Address: ", value: interfaceAddress},
+                         {key: 3, label: "Interface Port: ", value: interfacePort},
+                         {key: 4, label: "Robot Address: ", value: robotAddress},
+                         {key: 5, label: "Robot Port: ", value: robotPort},
+                         {key: 6, label: "Description: ", value: description} ] );
       setShowSubmitConfirm( true );
    }
 
@@ -37,7 +41,7 @@ export default function ConfigForm()
 
    function handleSubmit( data )
    {
-      console.log( "handleSubmit(): ")
+      console.log( "handleSubmit(): " )
       data.map( (data) => console.log( data.label + data.value ) );
 
       /* TODO: Add spinner for database update. */
@@ -54,8 +58,10 @@ export default function ConfigForm()
    }
 
    const onNameInput = ( {target:{value}} ) => setName( value );
-   const onAddressInput = ( {target:{value}} ) => setAddress( value );
-   const onPortInput = ( {target:{value}} ) => setPort( value );
+   const onInterfaceAddressInput = ( {target:{value}} ) => setInterfaceAddress( value );
+   const onInterfacePortInput = ( {target:{value}} ) => setInterfacePort( value );
+   const onRobotAddressInput = ( {target:{value}} ) => setRobotAddress( value );
+   const onRobotPortInput = ( {target:{value}} ) => setRobotPort( value );
    const onDescriptionInput = ( {target:{value}} ) => setDescription( value );
 
    return( 
@@ -68,16 +74,28 @@ export default function ConfigForm()
                              value={name}
                              placeholder="ex. Fred" />
                <br />
+               <Form.Label>Address of Interface</Form.Label>
+               <Form.Control as='input' type='text' id="interfaceAddress"
+                             onChange={onInterfaceAddressInput}
+                             value={interfaceAddress}
+                             placeholder="ex. 123.456.78.90 or 1234:abcd:56ef:7890 or my.example.com" />
+               <br />
+               <Form.Label>Port for Address of Interface</Form.Label>
+               <Form.Control as='input' type='text' id="interfacePort"
+                             onChange={onInterfacePortInput}
+                             value={interfacePort}
+                             placeholder="ex. 1234" />
+               <br />
                <Form.Label>Address of Robot</Form.Label>
-               <Form.Control as='input' type='text' id="address"
-                             onChange={onAddressInput}
-                             value={address}
+               <Form.Control as='input' type='text' id="robotAddress"
+                             onChange={onRobotAddressInput}
+                             value={robotAddress}
                              placeholder="ex. 123.456.78.90 or 1234:abcd:56ef:7890 or my.example.com" />
                <br />
                <Form.Label>Port for Address of Robot</Form.Label>
-               <Form.Control as='input' type='text' id="port"
-                             onChange={onPortInput}
-                             value={port}
+               <Form.Control as='input' type='text' id="robotPort"
+                             onChange={onRobotPortInput}
+                             value={robotPort}
                              placeholder="ex. 1234" />
                <br />
                <Form.Label>Description</Form.Label>

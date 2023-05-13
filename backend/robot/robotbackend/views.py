@@ -55,7 +55,7 @@ class RobotRest():
         if( serializer.is_valid() ):
             serializer.save()
             return Response( status=status.HTTP_201_CREATED )
-        print( "Errors = " + str( serializer.errors ) + ", data = " + str( serializer.data ) )
+        print( "post(): Errors = " + str( serializer.errors ) + ", data = " + str( serializer.data ) )
         return Response( serializer.errors, status=status.HTTP_400_BAD_REQUEST )
 
     def put( self ):

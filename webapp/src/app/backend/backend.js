@@ -40,9 +40,11 @@ export function addNewConfig( data )
 {
     console.log( "axios.post(): Data = " + JSON.stringify( data ) );
     const response = axios.post( '/Robot/', { name: data[0].value,
-                                              robotIPAddress: data[1].value,
-                                              robotPort: data[2].value,
-                                              description: data[3].value} )
+                                              interfaceIPAddress: data[1].value,
+                                              interfacePort: data[2].value,
+                                              robotIPAddress: data[3].value,
+                                              robotPort: data[4].value,
+                                              description: data[5].value} )
                           .then( ( resp ) => { return resp } );
     // FIXME: handle response errors
     return response
@@ -52,9 +54,11 @@ export function updateConfig( data )
 {
     console.log( "axios.put(): Data = " + data );
     const response = axios.put( '/Robot/', { name: data[0].value,
-                                             robotIPAddress: data[1].value,
-                                             robotPort: data[2].value,
-                                             description: data[3].value} )
+                                             interfaceIPAddress: data[1].value,
+                                             interfacePort: data[2].value,
+                                             robotIPAddress: data[3].value,
+                                             robotPort: data[4].value,
+                                             description: data[5].value} )
                           .then( (resp) => { return resp } );
     /*
                                            { name: data.name,
